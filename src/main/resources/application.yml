@@ -1,0 +1,31 @@
+server:
+  port: 8080
+logging:
+  level:
+    org:
+      atmosphere: warn
+spring:
+  mustache:
+    check-template-location: false
+  security:
+    oauth2:
+      client:
+        registration:
+          discord:
+            client-id: 907572774439112754
+            client-secret: ilBrRePq_GL4Og1PL7Yfm6XeV3d1rhSQ
+            clientAuthenticationMethod: post
+            authorizationGrantType: authorization_code
+            scope:
+              - identify
+              - guilds
+            redirectUri: "{baseUrl}/login"
+            clientName: Unity client
+        provider:
+          discord:
+            authorizationUri: https://discordapp.com/api/oauth2/authorize
+            tokenUri: https://discordapp.com/api/oauth2/token
+            userInfoUri: https://discordapp.com/api/users/@me
+            usernameAttribute: username
+vaadin:
+  whitelisted-packages: com/vaadin,org/vaadin,com/example/application
