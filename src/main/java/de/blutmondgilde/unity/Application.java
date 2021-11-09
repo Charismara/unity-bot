@@ -1,4 +1,4 @@
-package com.example.application;
+package de.blutmondgilde.unity;
 
 import com.vaadin.flow.component.page.AppShellConfigurator;
 import com.vaadin.flow.server.PWA;
