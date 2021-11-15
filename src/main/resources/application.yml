@@ -19,8 +19,8 @@ spring:
             scope:
               - identify
               - guilds
-            redirectUri: "{baseUrl}/login"
-            clientName: Unity client
+            redirectUri: "{baseUrl}/login/oauth2/callback/{registrationId}"
+            clientName: Discord-Client
         provider:
           discord:
             authorizationUri: https://discordapp.com/api/oauth2/authorize

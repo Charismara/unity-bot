@@ -1,15 +1,18 @@
 package de.blutmondgilde.unity.config;
 
 import com.vaadin.flow.spring.security.VaadinWebSecurityConfigurerAdapter;
-import de.blutmondgilde.unity.oauth.DiscordOAuth2AccessTokenResponseClient;
-import de.blutmondgilde.unity.oauth.DiscordOAuth2Service;
+import de.blutmondgilde.unity.views.home.LoginView;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
-import org.springframework.web.client.RestOperations;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
+@EnableWebSecurity
 @Configuration
 public class SecurityConfig extends VaadinWebSecurityConfigurerAdapter {
     public static final String DISCORD_BOT_USER_AGENT = "DiscordBot (https://unity.blutmondgilde.de)";
@@ -17,10 +20,7 @@ public class SecurityConfig extends VaadinWebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         super.configure(http);
-        http.oauth2Login()
-            .tokenEndpoint().accessTokenResponseClient(new DiscordOAuth2AccessTokenResponseClient(restOperations()))
-            .and()
-            .userInfoEndpoint().userService(new DiscordOAuth2Service(restOperations()));
+        setLoginView(http, LoginView.class, "/logout");
     }
 
     @Override
@@ -33,7 +33,13 @@ public class SecurityConfig extends VaadinWebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public RestOperations restOperations() {
-        return new RestTemplate();
+    @Override
+    protected UserDetailsService userDetailsService() {
+        UserDetails admin = User.withUsername("Skyriis")
+            .password("{noop}admin")
+            .roles("ADMIN")
+            .build();
+
+        return new InMemoryUserDetailsManager(admin);
     }
 }

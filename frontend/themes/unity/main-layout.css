@@ -34,3 +34,48 @@
   align-items: center;
   display: flex;
 }
+
+.contrast-5pct {
+  background-color: var(--lumo-contrast-5pct);
+}
+.contrast-10pct {
+  background-color: var(--lumo-contrast-10pct);
+}
+.contrast-20pct {
+  background-color: var(--lumo-contrast-20pct);
+}
+.contrast-30pct {
+  background-color: var(--lumo-contrast-30pct);
+}
+.contrast-40pct {
+  background-color: var(--lumo-contrast-40pct);
+}
+.contrast-50pct {
+  background-color: var(--lumo-contrast-50pct);
+}
+.contrast-60pct {
+  background-color: var(--lumo-contrast-60pct);
+  color: var(--lumo-base-color);
+}
+.contrast-70pct {
+  background-color: var(--lumo-contrast-70pct);
+  color: var(--lumo-base-color);
+}
+.contrast-80pct {
+  background-color: var(--lumo-contrast-80pct);
+  color: var(--lumo-base-color);
+}
+.contrast-90pct {
+  background-color: var(--lumo-contrast-90pct);
+  color: var(--lumo-base-color);
+}
+.contrast {
+  background-color: var(--lumo-contrast);
+  color: var(--lumo-base-color);
+}
+
+@media (max-width: 260px) {
+  .toolbar vaadin-button {
+    display: none;
+  }
+}
