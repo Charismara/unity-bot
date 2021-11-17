@@ -1,5 +1,8 @@
 server:
   port: 8080
+  servlet:
+    session:
+      timeout: 1m
 logging:
   level:
     org:
@@ -29,3 +32,6 @@ spring:
             usernameAttribute: username
 vaadin:
   whitelisted-packages: com/vaadin,org/vaadin,com/example/application
+  closeIdleSessions: false
+  heartbeatInterval: 10
+

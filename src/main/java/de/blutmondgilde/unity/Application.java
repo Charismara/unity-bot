@@ -17,6 +17,7 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
  *
  */
 @SpringBootApplication
+
 @Theme(value = "unity", variant = Lumo.DARK)
 @PWA(name = "Unity", shortName = "Unity", offlineResources = {"images/logo.png"})
 @NpmPackage(value = "line-awesome", version = "1.3.0")
