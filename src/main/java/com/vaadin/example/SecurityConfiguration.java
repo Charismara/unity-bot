@@ -54,7 +54,7 @@ public class SecurityConfiguration extends VaadinWebSecurityConfigurerAdapter {
         //Configure Vaadin
         super.configure(http);
         //Set LoginScreen as login view
-        setLoginView(http, LoginScreen.class);
+        setLoginView(http, LoginScreen.class,LOGOUT_SUCCESS_URL);
     }
 
     /**
