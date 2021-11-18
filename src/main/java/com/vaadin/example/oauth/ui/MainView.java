@@ -4,6 +4,7 @@ package com.vaadin.example.oauth.ui;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,7 +14,8 @@ import javax.annotation.PostConstruct;
 /**
  * Application main class that is hidden to user before authentication.
  */
-@Route("")
+@PageTitle("Home")
+@Route
 public class MainView extends VerticalLayout {
     @PostConstruct
     public void init() {

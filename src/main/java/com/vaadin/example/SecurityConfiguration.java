@@ -1,7 +1,9 @@
 package com.vaadin.example;
 
+import com.vaadin.example.oauth.ui.LoginScreen;
 import com.vaadin.flow.server.HandlerHelper;
 import com.vaadin.flow.shared.ApplicationConstants;
+import com.vaadin.flow.spring.security.VaadinWebSecurityConfigurerAdapter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -9,7 +11,6 @@ import org.springframework.http.RequestEntity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
@@ -25,7 +26,7 @@ import java.util.stream.Stream;
 
 @EnableWebSecurity
 @Configuration
-public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+public class SecurityConfiguration extends VaadinWebSecurityConfigurerAdapter {
 
     private static final String LOGIN_URL = "/login";
     private static final String LOGOUT_URL = "/logout";
@@ -37,27 +38,21 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
      */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        // @formatter:off
         http
+            // Allow all flow internal requests.
+            .authorizeRequests().requestMatchers(SecurityConfiguration::isFrameworkInternalRequest).permitAll()
+            .and()
 
-                // Allow all flow internal requests.
-                .authorizeRequests().requestMatchers(SecurityConfiguration::isFrameworkInternalRequest).permitAll()
-
-                // Restrict access to our application.
-                .and().authorizeRequests().anyRequest().authenticated()
-
-                // Not using Spring CSRF here to be able to use plain HTML for the login page
-                .and().csrf().disable()
-
-                // Configure logout
-                .logout().logoutUrl(LOGOUT_URL).logoutSuccessUrl(LOGOUT_SUCCESS_URL)
-
-                // Configure the login page with OAuth.
-                .and().oauth2Login().loginPage(LOGIN_URL).permitAll()
+            // Configure the login page with OAuth.
+            .oauth2Login().permitAll()
             .tokenEndpoint().accessTokenResponseClient(accessTokenResponseClient())
             .and()
             .userInfoEndpoint().userService(userService());
-        // @formatter:on
+
+        //Configure Vaadin
+        super.configure(http);
+        //Set LoginScreen as login view
+        setLoginView(http, LoginScreen.class);
     }
 
     /**
@@ -80,6 +75,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
             // icons and images
             "/icons/**", "/images/**");
+
+        try {
+            super.configure(web);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
