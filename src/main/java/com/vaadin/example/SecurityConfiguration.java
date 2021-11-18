@@ -1,24 +1,28 @@
 package com.vaadin.example;
 
-import java.util.stream.Stream;
-
-import javax.servlet.http.HttpServletRequest;
-
 import com.vaadin.flow.server.HandlerHelper;
+import com.vaadin.flow.shared.ApplicationConstants;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.RequestEntity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequestEntityConverter;
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequestEntityConverter;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
-import com.vaadin.flow.shared.ApplicationConstants;
+import javax.servlet.http.HttpServletRequest;
+import java.util.stream.Stream;
 
-/**
- * Configures Spring Security, doing the following:
- * <li>Bypass security checks for static resources,</li>
- * <li>Restrict access to the application, allowing only logged in users,</li>
- * <li>Set up the login form,</li>
- */
 @EnableWebSecurity
 @Configuration
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
@@ -49,7 +53,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .logout().logoutUrl(LOGOUT_URL).logoutSuccessUrl(LOGOUT_SUCCESS_URL)
 
                 // Configure the login page with OAuth.
-                .and().oauth2Login().loginPage(LOGIN_URL).permitAll();
+                .and().oauth2Login().loginPage(LOGIN_URL).permitAll()
+            .tokenEndpoint().accessTokenResponseClient(accessTokenResponseClient())
+            .and()
+            .userInfoEndpoint().userService(userService());
         // @formatter:on
     }
 
@@ -59,20 +66,20 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity web) {
         web.ignoring().antMatchers(
-                // client-side JS code
-                "/VAADIN/**",
+            // client-side JS code
+            "/VAADIN/**",
 
-                // client-side JS code
-                "/frontend/**",
+            // client-side JS code
+            "/frontend/**",
 
-                // the standard favicon URI
-                "/favicon.ico",
+            // the standard favicon URI
+            "/favicon.ico",
 
-                // web application manifest
-                "/manifest.webmanifest", "/sw.js", "/offline-page.html",
+            // web application manifest
+            "/manifest.webmanifest", "/sw.js", "/offline-page.html",
 
-                // icons and images
-                "/icons/**", "/images/**");
+            // icons and images
+            "/icons/**", "/images/**");
     }
 
     /**
@@ -81,10 +88,49 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
      * with any of the request types know.
      *
      * @param request {@link HttpServletRequest}
+     *
      * @return true if is an internal framework request. False otherwise.
      */
     static boolean isFrameworkInternalRequest(HttpServletRequest request) {
         final String parameterValue = request.getParameter(ApplicationConstants.REQUEST_TYPE_PARAMETER);
         return parameterValue != null && Stream.of(HandlerHelper.RequestType.values()).anyMatch(r -> r.getIdentifier().equals(parameterValue));
+    }
+
+    static RequestEntity<?> withUserAgent(RequestEntity<?> request) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.putAll(request.getHeaders());
+        headers.add(HttpHeaders.USER_AGENT, DISCORD_BOT_USER_AGENT);
+
+        return new RequestEntity<>(request.getBody(), headers, request.getMethod(), request.getUrl());
+    }
+
+    private static final String DISCORD_BOT_USER_AGENT = "DiscordBot (https://github.com/fourscouts/blog/tree/master/oauth2-discord)";
+
+    @Bean
+    public OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> accessTokenResponseClient() {
+        DefaultAuthorizationCodeTokenResponseClient client = new DefaultAuthorizationCodeTokenResponseClient();
+
+        client.setRequestEntityConverter(new OAuth2AuthorizationCodeGrantRequestEntityConverter() {
+            @Override
+            public RequestEntity<?> convert(OAuth2AuthorizationCodeGrantRequest oauth2Request) {
+                return withUserAgent(super.convert(oauth2Request));
+            }
+        });
+
+        return client;
+    }
+
+    @Bean
+    public OAuth2UserService<OAuth2UserRequest, OAuth2User> userService() {
+        DefaultOAuth2UserService service = new DefaultOAuth2UserService();
+
+        service.setRequestEntityConverter(new OAuth2UserRequestEntityConverter() {
+            @Override
+            public RequestEntity<?> convert(OAuth2UserRequest userRequest) {
+                return withUserAgent(super.convert(userRequest));
+            }
+        });
+
+        return service;
     }
 }
