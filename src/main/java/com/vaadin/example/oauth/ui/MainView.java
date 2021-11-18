@@ -10,12 +10,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.security.PermitAll;
 
 /**
  * Application main class that is hidden to user before authentication.
  */
 @PageTitle("Home")
 @Route
+@PermitAll
 public class MainView extends VerticalLayout {
     @PostConstruct
     public void init() {
