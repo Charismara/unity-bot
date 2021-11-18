@@ -41,10 +41,12 @@ public class SecurityConfiguration extends VaadinWebSecurityConfigurerAdapter {
         http
             // Allow all flow internal requests.
             .authorizeRequests().requestMatchers(SecurityConfiguration::isFrameworkInternalRequest).permitAll()
-            .and()
-
+            // Not using Spring CSRF here to be able to use plain HTML for the login page
+            .and().csrf().disable()
+            // Configure logout
+            .logout().logoutUrl(LOGOUT_URL).logoutSuccessUrl(LOGOUT_SUCCESS_URL)
             // Configure the login page with OAuth.
-            .oauth2Login().permitAll()
+            .and().oauth2Login().loginPage(LOGIN_URL).permitAll()
             .tokenEndpoint().accessTokenResponseClient(accessTokenResponseClient())
             .and()
             .userInfoEndpoint().userService(userService());
