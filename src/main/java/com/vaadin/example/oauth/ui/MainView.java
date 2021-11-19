@@ -7,8 +7,6 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.security.PermitAll;
@@ -28,14 +26,12 @@ public class MainView extends VerticalLayout {
 
     @PostConstruct
     public void init() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
         Div div = new Div();
-        div.setText("Hello " + authentication.getName());
+        div.setText("Hallo " + securityService.getAuthenticatedUser().getName());
         div.addClassName("font-size-xxl");
 
         Div data = new Div();
-        data.setText(securityService.getAuthenticatedUser().toString());
+        data.setText("Attribute: " + securityService.getAuthenticatedUser().getAttributes().toString());
 
         Button logout = new Button("Logout");
         logout.addClickListener(buttonClickEvent -> securityService.logout());
