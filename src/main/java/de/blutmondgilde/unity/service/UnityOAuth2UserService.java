@@ -3,7 +3,6 @@ package de.blutmondgilde.unity.service;
 import de.blutmondgilde.unity.data.DiscordOAuthUser;
 import de.blutmondgilde.unity.data.User;
 import de.blutmondgilde.unity.data.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.RequestEntity;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -16,10 +15,10 @@ import static de.blutmondgilde.unity.SecurityConfiguration.withUserAgent;
 
 @Service
 public class UnityOAuth2UserService extends DefaultOAuth2UserService {
-    @Autowired
     private UserRepository repo;
 
-    public UnityOAuth2UserService() {
+    public UnityOAuth2UserService(UserRepository repo) {
+        this.repo = repo;
         setRequestEntityConverter(new OAuth2UserRequestEntityConverter() {
             @Override
             public RequestEntity<?> convert(OAuth2UserRequest userRequest) {
