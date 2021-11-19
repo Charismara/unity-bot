@@ -1,9 +1,9 @@
-package com.vaadin.example;
+package de.blutmondgilde.unity;
 
-import com.vaadin.example.oauth.ui.LoginScreen;
 import com.vaadin.flow.server.HandlerHelper;
 import com.vaadin.flow.shared.ApplicationConstants;
 import com.vaadin.flow.spring.security.VaadinWebSecurityConfigurerAdapter;
+import de.blutmondgilde.unity.oauth.ui.LoginScreen;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;

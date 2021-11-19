@@ -1,12 +1,12 @@
 
-package com.vaadin.example.oauth.ui;
+package de.blutmondgilde.unity.oauth.ui;
 
-import com.vaadin.example.SecurityService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import de.blutmondgilde.unity.SecurityService;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.security.PermitAll;
