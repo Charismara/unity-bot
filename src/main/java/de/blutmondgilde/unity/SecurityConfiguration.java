@@ -3,6 +3,8 @@ package de.blutmondgilde.unity;
 import com.vaadin.flow.server.HandlerHelper;
 import com.vaadin.flow.shared.ApplicationConstants;
 import com.vaadin.flow.spring.security.VaadinWebSecurityConfigurerAdapter;
+import de.blutmondgilde.unity.service.UnityAuthenticationSuccessHandler;
+import de.blutmondgilde.unity.service.UnityOAuth2UserService;
 import de.blutmondgilde.unity.view.LoginScreen;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,11 +17,6 @@ import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationC
 import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequestEntityConverter;
-import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequestEntityConverter;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.stream.Stream;
@@ -31,6 +28,12 @@ public class SecurityConfiguration extends VaadinWebSecurityConfigurerAdapter {
     private static final String LOGIN_URL = "/login";
     private static final String LOGOUT_URL = "/logout";
     private static final String LOGOUT_SUCCESS_URL = "/";
+
+    UnityOAuth2UserService userService;
+
+    SecurityConfiguration(UnityOAuth2UserService userService) {
+        this.userService = userService;
+    }
 
     /**
      * Registers our UserDetailsService and the password encoder to be used on login
@@ -49,12 +52,14 @@ public class SecurityConfiguration extends VaadinWebSecurityConfigurerAdapter {
             .and().oauth2Login().loginPage(LOGIN_URL).permitAll()
             .tokenEndpoint().accessTokenResponseClient(accessTokenResponseClient())
             .and()
-            .userInfoEndpoint().userService(userService());
+            .userInfoEndpoint().userService(userService)
+            .and()
+            .successHandler(new UnityAuthenticationSuccessHandler(userService));
 
         //Configure Vaadin
         super.configure(http);
         //Set LoginScreen as login view
-        setLoginView(http, LoginScreen.class,LOGOUT_SUCCESS_URL);
+        setLoginView(http, LoginScreen.class, LOGOUT_SUCCESS_URL);
     }
 
     /**
@@ -99,7 +104,7 @@ public class SecurityConfiguration extends VaadinWebSecurityConfigurerAdapter {
         return parameterValue != null && Stream.of(HandlerHelper.RequestType.values()).anyMatch(r -> r.getIdentifier().equals(parameterValue));
     }
 
-    static RequestEntity<?> withUserAgent(RequestEntity<?> request) {
+    public static RequestEntity<?> withUserAgent(RequestEntity<?> request) {
         HttpHeaders headers = new HttpHeaders();
         headers.putAll(request.getHeaders());
         headers.add(HttpHeaders.USER_AGENT, DISCORD_BOT_USER_AGENT);
@@ -121,19 +126,5 @@ public class SecurityConfiguration extends VaadinWebSecurityConfigurerAdapter {
         });
 
         return client;
-    }
-
-    @Bean
-    public OAuth2UserService<OAuth2UserRequest, OAuth2User> userService() {
-        DefaultOAuth2UserService service = new DefaultOAuth2UserService();
-
-        service.setRequestEntityConverter(new OAuth2UserRequestEntityConverter() {
-            @Override
-            public RequestEntity<?> convert(OAuth2UserRequest userRequest) {
-                return withUserAgent(super.convert(userRequest));
-            }
-        });
-
-        return service;
     }
 }
