@@ -32,12 +32,15 @@ public class MainView extends VerticalLayout {
 
         Div div = new Div();
         div.setText("Hello " + authentication.getName());
-        div.getElement().getStyle().set("font-size", "xx-large");
+        div.addClassName("font-size-xxl");
+
+        Div data = new Div();
+        data.setText(securityService.getAuthenticatedUser().toString());
 
         Button logout = new Button("Logout");
         logout.addClickListener(buttonClickEvent -> securityService.logout());
 
         setAlignItems(Alignment.CENTER);
-        add(div, logout);
+        add(div, data, logout);
     }
 }
