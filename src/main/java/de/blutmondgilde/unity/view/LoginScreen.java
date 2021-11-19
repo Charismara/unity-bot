@@ -1,4 +1,4 @@
-package de.blutmondgilde.unity.oauth.ui;
+package de.blutmondgilde.unity.view;
 
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Paragraph;

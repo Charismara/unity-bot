@@ -1,5 +1,5 @@
 
-package de.blutmondgilde.unity.oauth.ui;
+package de.blutmondgilde.unity.view;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Div;
