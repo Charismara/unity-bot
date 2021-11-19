@@ -34,3 +34,28 @@
     align-items: center;
     display: flex;
 }
+
+.font-size-xxxl {
+    font-size: var(--lumo-font-size-xxxl);
+}
+.font-size-xxl {
+    font-size: var(--lumo-font-size-xxl);
+}
+.font-size-xl {
+    font-size: var(--lumo-font-size-xl);
+}
+.font-size-l {
+    font-size: var(--lumo-font-size-l);
+}
+.font-size-m {
+    font-size: var(--lumo-font-size-m);
+}
+.font-size-s {
+    font-size: var(--lumo-font-size-s);
+}
+.font-size-xs {
+    font-size: var(--lumo-font-size-xs);
+}
+.font-size-xxs {
+    font-size: var(--lumo-font-size-xxs);
+}
