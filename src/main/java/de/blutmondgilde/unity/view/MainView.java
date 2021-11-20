@@ -7,7 +7,6 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import de.blutmondgilde.unity.SecurityService;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 
@@ -22,11 +21,9 @@ import javax.annotation.security.PermitAll;
 @PermitAll
 public class MainView extends VerticalLayout {
     SecurityService securityService;
-    OAuth2AuthorizedClientService clientService;
 
-    MainView(SecurityService securityService, OAuth2AuthorizedClientService authorizedClientService) {
+    MainView(SecurityService securityService) {
         this.securityService = securityService;
-        this.clientService = authorizedClientService;
     }
 
     @PostConstruct
