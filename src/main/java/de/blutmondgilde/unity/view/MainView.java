@@ -68,7 +68,6 @@ public class MainView extends VerticalLayout {
 
     private void updateGuildList(Guild[] guildArray) {
         List<Guild> guildList = Arrays.stream(guildArray).filter(Guild::isOwner).toList();
-        System.out.println(guildList);
         getUI().ifPresent(ui -> ui.access(() -> {
             this.guilds.removeAll();
             guildList.forEach(guild -> {
