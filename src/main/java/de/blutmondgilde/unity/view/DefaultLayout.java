@@ -1,13 +1,21 @@
 package de.blutmondgilde.unity.view;
 
 import com.vaadin.flow.component.Unit;
+import com.vaadin.flow.component.avatar.Avatar;
+import com.vaadin.flow.component.contextmenu.MenuItem;
+import com.vaadin.flow.component.contextmenu.SubMenu;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.menubar.MenuBar;
+import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.RouterLayout;
 import de.blutmondgilde.unity.SecurityService;
+import de.blutmondgilde.unity.data.AvatarType;
 
 
 public class DefaultLayout extends VerticalLayout implements RouterLayout {
@@ -35,6 +43,8 @@ public class DefaultLayout extends VerticalLayout implements RouterLayout {
 
         if (!securityService.isLoggedIn()) {
             layout.add(createLoginButton());
+        } else {
+            layout.add(createProfileMenu());
         }
 
         layout.setFlexGrow(1, name);
@@ -62,5 +72,31 @@ public class DefaultLayout extends VerticalLayout implements RouterLayout {
 
         login.add(anchorLayout);
         return login;
+    }
+
+    private MenuBar createProfileMenu() {
+        MenuBar profileBar = new MenuBar();
+        profileBar.getStyle().set("padding-top", "0.25rem");
+        profileBar.getStyle().set("padding-right", "1rem");
+        profileBar.addThemeVariants(MenuBarVariant.LUMO_TERTIARY_INLINE);
+
+        HorizontalLayout navbarProfile = new HorizontalLayout();
+        navbarProfile.setAlignItems(Alignment.CENTER);
+        navbarProfile.setJustifyContentMode(JustifyContentMode.CENTER);
+        navbarProfile.setSpacing(false);
+        navbarProfile.setPadding(false);
+        navbarProfile.setMargin(false);
+        navbarProfile.add(new Avatar(securityService.getAuthenticatedUser().getName(), securityService.getAuthenticatedUser().getAvatarUrl(AvatarType.WebP)));
+        Span text = new Span(securityService.getAuthenticatedUser().getName());
+        text.getStyle().set("padding-left","0.25rem");
+        text.getStyle().set("padding-right","0.5rem");
+        navbarProfile.add(text);
+        navbarProfile.add(new Icon(VaadinIcon.CHEVRON_DOWN));
+
+        MenuItem profileItem = profileBar.addItem(navbarProfile);
+        SubMenu profileSubMenu = profileItem.getSubMenu();
+        profileSubMenu.addItem("Logout", menuItemClickEvent -> securityService.logout());
+
+        return profileBar;
     }
 }

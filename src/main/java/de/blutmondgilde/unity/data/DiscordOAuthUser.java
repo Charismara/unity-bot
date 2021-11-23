@@ -42,8 +42,12 @@ public class DiscordOAuthUser implements OAuth2User {
         return oAuth2User.getAttribute("avatar");
     }
 
+    public String getAvatarUrl(AvatarType avatarType) {
+        return "https://cdn.discordapp.com/avatars/" + getDiscordId() + "/" + getAvatarHash() + "." + avatarType.getType();
+    }
+
     public Image getAvatarImage(AvatarType avatarType) {
-        return new Image("https://cdn.discordapp.com/avatars/" + getDiscordId() + "/" + getAvatarHash() + "." + avatarType.getType(), "Discord-Icon.png");
+        return new Image(getAvatarUrl(avatarType), "Discord-Icon.png");
     }
 
     public String getEMail() {
