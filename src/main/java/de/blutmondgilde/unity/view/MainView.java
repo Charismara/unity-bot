@@ -21,7 +21,7 @@ import java.util.List;
  * Application main class that is hidden to user before authentication.
  */
 @PageTitle("Home")
-@Route
+@Route(layout = DefaultLayout.class)
 @PermitAll
 public class MainView extends VerticalLayout {
     SecurityService securityService;
@@ -32,7 +32,7 @@ public class MainView extends VerticalLayout {
         this.discordAPIHelper = new DiscordAPIHelper(securityService);
     }
 
-    private Div guilds = new Div();
+    private final Div guilds = new Div();
 
     @PostConstruct
     public void init() {

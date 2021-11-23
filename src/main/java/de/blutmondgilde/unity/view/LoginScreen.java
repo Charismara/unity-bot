@@ -12,7 +12,7 @@ import javax.annotation.PostConstruct;
 /**
  * Adds an explicit link that the user has to click to login.
  */
-@Route("login")
+@Route(value = "login", layout = DefaultLayout.class)
 @PageTitle("Login")
 public class LoginScreen extends VerticalLayout {
     private static final String URL_DISCORD = "/oauth2/authorization/discord";

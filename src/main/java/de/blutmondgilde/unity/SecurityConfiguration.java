@@ -89,7 +89,9 @@ public class SecurityConfiguration extends VaadinWebSecurityConfigurerAdapter {
             "/manifest.webmanifest", "/sw.js", "/offline-page.html",
 
             // icons and images
-            "/icons/**", "/images/**");
+            "/icons/**", "/images/**",
+
+            "/img/**");
 
         try {
             super.configure(web);
