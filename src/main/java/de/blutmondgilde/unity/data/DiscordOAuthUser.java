@@ -1,5 +1,6 @@
 package de.blutmondgilde.unity.data;
 
+import com.vaadin.flow.component.html.Image;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -39,6 +40,10 @@ public class DiscordOAuthUser implements OAuth2User {
 
     public String getAvatarHash() {
         return oAuth2User.getAttribute("avatar");
+    }
+
+    public Image getAvatarImage(AvatarType avatarType) {
+        return new Image("https://cdn.discordapp.com/avatars/" + getDiscordId() + "/" + getAvatarHash() + "." + avatarType.getType(), "Discord-Icon.png");
     }
 
     public String getEMail() {

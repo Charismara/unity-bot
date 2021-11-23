@@ -8,6 +8,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import de.blutmondgilde.unity.SecurityService;
+import de.blutmondgilde.unity.data.AvatarType;
 import de.blutmondgilde.unity.data.discordapi.Guild;
 import de.blutmondgilde.unity.service.DiscordAPIHelper;
 
@@ -36,8 +37,10 @@ public class MainView extends VerticalLayout {
     @PostConstruct
     public void init() {
         Div div = new Div();
-        div.setText("Hallo " + securityService.getAuthenticatedUser().getName());
-        div.addClassName("font-size-xxl");
+        Paragraph name = new Paragraph("Hallo " + securityService.getAuthenticatedUser().getName());
+        name.addClassName("font-size-xxl");
+
+        div.add(securityService.getAuthenticatedUser().getAvatarImage(AvatarType.WebP), name);
 
         Div data = new Div();
         data.setText("Attribute: " + securityService.getAuthenticatedUser().getAttributes().toString());
