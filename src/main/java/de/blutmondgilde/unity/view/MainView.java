@@ -3,12 +3,11 @@ package de.blutmondgilde.unity.view;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import de.blutmondgilde.unity.SecurityService;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
-import org.springframework.security.web.authentication.WebAuthenticationDetails;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.security.PermitAll;
@@ -35,11 +34,9 @@ public class MainView extends VerticalLayout {
         Div data = new Div();
         data.setText("Attribute: " + securityService.getAuthenticatedUser().getAttributes().toString());
 
-        OAuth2AuthenticationToken token = securityService.getOAuth2AuthenticationToken();
-        WebAuthenticationDetails details = (WebAuthenticationDetails) token.getDetails();
-
         Div authentication = new Div();
-        authentication.setText("");
+        Paragraph p1 = new Paragraph("Loaded Service Client: " + securityService.getAccessToken().getTokenValue());
+        authentication.add(p1);
 
         Button logout = new Button("Logout");
         logout.addClickListener(buttonClickEvent -> securityService.logout());
