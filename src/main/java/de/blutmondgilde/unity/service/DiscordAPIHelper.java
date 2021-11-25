@@ -1,6 +1,5 @@
 package de.blutmondgilde.unity.service;
 
-import de.blutmondgilde.unity.SecurityService;
 import de.blutmondgilde.unity.data.discordapi.Guild;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;

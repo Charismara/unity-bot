@@ -1,4 +1,4 @@
-package de.blutmondgilde.unity;
+package de.blutmondgilde.unity.config;
 
 import com.vaadin.flow.server.HandlerHelper;
 import com.vaadin.flow.shared.ApplicationConstants;

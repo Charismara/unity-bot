@@ -1,4 +1,4 @@
-package de.blutmondgilde.unity;
+package de.blutmondgilde.unity.service;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.server.VaadinServletRequest;

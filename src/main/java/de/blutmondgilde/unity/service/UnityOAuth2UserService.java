@@ -11,7 +11,7 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
-import static de.blutmondgilde.unity.SecurityConfiguration.withUserAgent;
+import static de.blutmondgilde.unity.config.SecurityConfiguration.withUserAgent;
 
 @Service
 public class UnityOAuth2UserService extends DefaultOAuth2UserService {

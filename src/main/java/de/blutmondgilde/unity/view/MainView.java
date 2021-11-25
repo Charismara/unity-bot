@@ -7,13 +7,15 @@ import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import de.blutmondgilde.unity.SecurityService;
+import de.blutmondgilde.unity.service.DiscordEventService;
+import de.blutmondgilde.unity.service.SecurityService;
 import de.blutmondgilde.unity.data.AvatarType;
 import de.blutmondgilde.unity.data.discordapi.Guild;
 import de.blutmondgilde.unity.service.DiscordAPIHelper;
+import net.dv8tion.jda.api.JDA;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.security.RolesAllowed;
+import javax.annotation.security.PermitAll;
 import java.util.Arrays;
 import java.util.List;
 
@@ -22,13 +24,17 @@ import java.util.List;
  */
 @PageTitle("Home")
 @Route(layout = DefaultLayout.class)
-@RolesAllowed("SCOPE_guilds")
+@PermitAll
 public class MainView extends VerticalLayout {
-    SecurityService securityService;
-    DiscordAPIHelper discordAPIHelper;
+    final SecurityService securityService;
+    final JDA discordBot;
+    final DiscordAPIHelper discordAPIHelper;
+    final DiscordEventService discordEventService;
 
-    MainView(SecurityService securityService) {
+    MainView(SecurityService securityService, JDA discordBot, DiscordEventService discordEventService) {
         this.securityService = securityService;
+        this.discordBot = discordBot;
+        this.discordEventService = discordEventService;
         this.discordAPIHelper = new DiscordAPIHelper(securityService);
     }
 
@@ -73,7 +79,7 @@ public class MainView extends VerticalLayout {
             this.guilds.removeAll();
 
             guildList.forEach(guild -> {
-                VerticalLayout guildComponent = guild.createComponent();
+                VerticalLayout guildComponent = guild.createComponent(discordBot);
                 this.guilds.add(guildComponent);
             });
         }));

@@ -14,7 +14,7 @@ import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.RouterLayout;
-import de.blutmondgilde.unity.SecurityService;
+import de.blutmondgilde.unity.service.SecurityService;
 import de.blutmondgilde.unity.data.AvatarType;
 
 
