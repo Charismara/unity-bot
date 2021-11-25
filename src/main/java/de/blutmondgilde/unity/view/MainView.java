@@ -45,9 +45,6 @@ public class MainView extends VerticalLayout {
 
         div.add(securityService.getAuthenticatedUser().getAvatarImage(AvatarType.WebP), name);
 
-        Div data = new Div();
-        data.setText("Attribute: " + securityService.getAuthenticatedUser().toString());
-
         guilds.add(new Paragraph("Loading Guilds..."));
         guilds.setJustifyContentMode(JustifyContentMode.AROUND);
         guilds.setAlignItems(Alignment.STRETCH);
@@ -60,7 +57,7 @@ public class MainView extends VerticalLayout {
             .subscribe();
 
         setAlignItems(Alignment.CENTER);
-        add(div, data, guilds);
+        add(div, guilds);
     }
 
     private void updateGuildListError(Throwable throwable) {
