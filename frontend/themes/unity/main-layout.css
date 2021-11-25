@@ -291,3 +291,7 @@
     font-size: 1.5rem;
     padding: 0.25rem 0.5rem;
 }
+
+.no-underline:hover{
+    text-decoration: none;
+}

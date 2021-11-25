@@ -5,6 +5,7 @@ import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.contextmenu.SubMenu;
 import com.vaadin.flow.component.html.Anchor;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
@@ -14,8 +15,10 @@ import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.RouterLayout;
-import de.blutmondgilde.unity.service.SecurityService;
+import com.vaadin.flow.router.RouterLink;
 import de.blutmondgilde.unity.data.AvatarType;
+import de.blutmondgilde.unity.service.SecurityService;
+import de.blutmondgilde.unity.view.MainView;
 
 
 public class DefaultLayout extends VerticalLayout implements RouterLayout {
@@ -36,10 +39,20 @@ public class DefaultLayout extends VerticalLayout implements RouterLayout {
         layout.addClassName("no-margin-left");
         layout.addClassName("no-margin-right");
 
+        Div leftAlignedItems = new Div();
+
+        RouterLink homeLink = new RouterLink();
+        homeLink.setRoute(MainView.class);
+        homeLink.addClassNames("no-underline", "header-text");
+
         Span name = new Span("Unity");
         name.addClassName("font-size-xxl");
         name.getStyle().set("padding-left", "1rem");
-        layout.add(name);
+        homeLink.add(name);
+
+        leftAlignedItems.add(homeLink);
+        layout.add(leftAlignedItems);
+
 
         if (!securityService.isLoggedIn()) {
             layout.add(createLoginButton());
@@ -47,7 +60,7 @@ public class DefaultLayout extends VerticalLayout implements RouterLayout {
             layout.add(createProfileMenu());
         }
 
-        layout.setFlexGrow(1, name);
+        layout.setFlexGrow(1, leftAlignedItems);
         return layout;
     }
 
@@ -88,8 +101,8 @@ public class DefaultLayout extends VerticalLayout implements RouterLayout {
         navbarProfile.setMargin(false);
         navbarProfile.add(new Avatar(securityService.getAuthenticatedUser().getName(), securityService.getAuthenticatedUser().getAvatarUrl(AvatarType.WebP)));
         Span text = new Span(securityService.getAuthenticatedUser().getName());
-        text.getStyle().set("padding-left","0.25rem");
-        text.getStyle().set("padding-right","0.5rem");
+        text.getStyle().set("padding-left", "0.25rem");
+        text.getStyle().set("padding-right", "0.5rem");
         navbarProfile.add(text);
         navbarProfile.add(new Icon(VaadinIcon.CHEVRON_DOWN));
 
