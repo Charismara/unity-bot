@@ -14,8 +14,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 public class ScheduledTasksConfig {
     private final DiscordBotService discordBotService;
 
-    //@Scheduled(cron = "0 0 0 * * *")
-    @Scheduled(cron = "0 */5 * * * *") //testing
+    @Scheduled(cron = "0 0 0 * * *")
+    //@Scheduled(cron = "0 */5 * * * *") //testing
     public void gatherUserData() {
         log.info("Gathering Discord Server Stats...");
         long start = System.currentTimeMillis();
