@@ -3,12 +3,12 @@ package de.blutmondgilde.unity.view.component;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import de.blutmondgilde.unity.data.discordapi.Guild;
 import de.blutmondgilde.unity.service.DiscordEventService;
+import de.blutmondgilde.unity.view.DiscordServerConfiguration;
 
 public class DiscordServer extends VerticalLayout {
     private final Guild guild;
@@ -79,9 +79,6 @@ public class DiscordServer extends VerticalLayout {
     }
 
     private void navigateToSettingsPage(String guildId) {
-        getUI().ifPresent(ui -> ui.access(() -> {
-            Notification.show("Joined " + guildId);
-            //TODO redirect to settings menu
-        }));
+        getUI().ifPresent(ui -> ui.navigate(DiscordServerConfiguration.class));
     }
 }
