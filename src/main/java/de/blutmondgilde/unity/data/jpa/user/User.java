@@ -1,4 +1,4 @@
-package de.blutmondgilde.unity.data.jpa;
+package de.blutmondgilde.unity.data.jpa.user;
 
 import de.blutmondgilde.unity.data.DiscordOAuthUser;
 import lombok.Getter;

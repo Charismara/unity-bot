@@ -1,8 +1,8 @@
 package de.blutmondgilde.unity.service;
 
 import de.blutmondgilde.unity.data.DiscordOAuthUser;
-import de.blutmondgilde.unity.data.jpa.User;
-import de.blutmondgilde.unity.data.jpa.UserRepository;
+import de.blutmondgilde.unity.data.jpa.user.User;
+import de.blutmondgilde.unity.data.jpa.user.UserRepository;
 import org.springframework.http.RequestEntity;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;

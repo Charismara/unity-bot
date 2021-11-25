@@ -2,8 +2,12 @@ package de.blutmondgilde.unity.service;
 
 import de.blutmondgilde.unity.api.discord.callback.BotJoinedCallback;
 import de.blutmondgilde.unity.data.discordapi.Guild;
-import de.blutmondgilde.unity.data.jpa.GuildSettings;
-import de.blutmondgilde.unity.data.jpa.GuildSettingsRepository;
+import de.blutmondgilde.unity.data.jpa.guild.GuildSettings;
+import de.blutmondgilde.unity.data.jpa.guild.GuildSettingsRepository;
+import de.blutmondgilde.unity.data.jpa.stats.GuildUserAmount;
+import de.blutmondgilde.unity.data.jpa.stats.GuildUserAmountRepository;
+import de.blutmondgilde.unity.data.jpa.stats.GuildUserStats;
+import de.blutmondgilde.unity.data.jpa.stats.GuildUserStatsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
@@ -14,6 +18,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,6 +30,8 @@ public class DiscordBotService extends ListenerAdapter {
     private final ConcurrentHashMap<String, BotJoinedCallback> waitingGuilds = new ConcurrentHashMap<>();
     private Optional<JDA> discordBot = Optional.empty();
     private final GuildSettingsRepository guildSettingsRepository;
+    private final GuildUserAmountRepository userAmountRepository;
+    private final GuildUserStatsRepository userStatsRepository;
 
     @Override
     public void onReady(@NotNull ReadyEvent event) {
@@ -72,5 +79,27 @@ public class DiscordBotService extends ListenerAdapter {
 
     public Optional<Member> findUser(net.dv8tion.jda.api.entities.Guild guild, String userName, String discriminator) {
         return Optional.ofNullable(guild.getMemberByTag(userName, discriminator));
+    }
+
+    public void gatherTotalUserStats() {
+        this.discordBot.ifPresent(bot -> {
+            bot.getGuilds().forEach(guild -> {
+                //Load userStats of the Guild
+                GuildUserStats userStats = userStatsRepository.findById(guild.getIdLong()).orElseGet(() -> {
+                    GuildUserStats stats = new GuildUserStats();
+                    stats.setGuildId(guild.getIdLong());
+                    return userStatsRepository.save(stats);
+                });
+
+                //Create new timestamp
+                GuildUserAmount userAmount = new GuildUserAmount();
+                userAmount.setGuildId(userStats.getGuildId());
+                userAmount.setCreationDate(new Date());
+                userAmount.setUserCount(guild.getMemberCount());
+
+                //save timestamp
+                userAmountRepository.save(userAmount);
+            });
+        });
     }
 }

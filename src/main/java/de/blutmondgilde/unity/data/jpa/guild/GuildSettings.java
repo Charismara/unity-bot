@@ -1,4 +1,4 @@
-package de.blutmondgilde.unity.data.jpa;
+package de.blutmondgilde.unity.data.jpa.guild;
 
 import lombok.Getter;
 import lombok.Setter;

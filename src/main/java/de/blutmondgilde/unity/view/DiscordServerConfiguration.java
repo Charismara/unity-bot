@@ -1,6 +1,9 @@
 package de.blutmondgilde.unity.view;
 
 import com.vaadin.flow.component.AttachEvent;
+import com.vaadin.flow.component.charts.Chart;
+import com.vaadin.flow.component.charts.model.ChartType;
+import com.vaadin.flow.component.charts.model.DataSeries;
 import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -10,7 +13,7 @@ import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import de.blutmondgilde.unity.data.jpa.GuildSettingsRepository;
+import de.blutmondgilde.unity.data.jpa.guild.GuildSettingsRepository;
 import de.blutmondgilde.unity.service.DiscordBotService;
 import de.blutmondgilde.unity.service.SecurityService;
 import de.blutmondgilde.unity.view.component.VerticalPagedTabs;
@@ -48,10 +51,10 @@ public class DiscordServerConfiguration extends HorizontalLayout implements HasU
     private void initializeContent() {
         VerticalLayout container = new VerticalLayout();
         PagedTabs tabs = new VerticalPagedTabs(container);
-        tabs.add("Statistics", createStatsContainer(), false);
-        tabs.add("Polls", createStatsContainer(), false);
-        tabs.add("Reaction Rolls", createStatsContainer(), false);
-        tabs.add("Temporary Channels", createStatsContainer(), false);
+        tabs.add("Statistics", createStatsOverview(), false);
+        tabs.add("Polls", createEmptyContainer(), false);
+        tabs.add("Reaction Rolls", createEmptyContainer(), false);
+        tabs.add("Temporary Channels", createEmptyContainer(), false);
 
         if (securityService.getAuthenticatedUser().getDiscordId() == guild.getOwnerIdLong()) {
             tabs.add("Panel Settings", createPanelSettings(), false);
@@ -60,9 +63,28 @@ public class DiscordServerConfiguration extends HorizontalLayout implements HasU
         add(tabs, container);
     }
 
-    private VerticalLayout createStatsContainer() {
+    private VerticalLayout createEmptyContainer() {
         VerticalLayout layout = new VerticalLayout();
         layout.addClassNames("box l radius", "contrast-5pct");
+
+        return layout;
+    }
+
+    private VerticalLayout createStatsOverview() {
+        VerticalLayout layout = new VerticalLayout();
+        layout.addClassNames("box l radius", "contrast-5pct");
+
+        Chart userAmountChart = new Chart(ChartType.LINE);
+        userAmountChart.getConfiguration().setTitle("Total Users");
+        userAmountChart.getConfiguration().setSubTitle("Shows the total amount of Users on this Server");
+        userAmountChart.getConfiguration().getyAxis().setTitle("users");
+        userAmountChart.getConfiguration().getxAxis().setTitle("date");
+
+        DataSeries userTimeDataSeries = new DataSeries("Total Users");
+
+        userAmountChart.getConfiguration().setSeries(userTimeDataSeries);
+        userAmountChart.setWidthFull();
+        layout.add(userAmountChart);
 
         return layout;
     }
@@ -133,6 +155,11 @@ public class DiscordServerConfiguration extends HorizontalLayout implements HasU
 
     @Override
     protected void onAttach(AttachEvent attachEvent) {
+
+    }
+
+    private void updateChart() {
+        //TODO update chart data
 
     }
 }
