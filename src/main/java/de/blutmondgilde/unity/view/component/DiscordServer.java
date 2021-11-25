@@ -54,29 +54,34 @@ public class DiscordServer extends VerticalLayout {
         layout.setAlignItems(FlexComponent.Alignment.CENTER);
         layout.addClassName("guildBlurOnHover");
 
-        //TODO change to "Settings" if bot is already on this Server
-        Span clickText = new Span("Setup");
-        clickText.addClassNames("box l radius", "guildSetupButton");
-        layout.add(clickText);
-        layout.addClickListener(flexLayoutClickEvent -> {
-            flexLayoutClickEvent.getSource().getUI().ifPresent(ui -> {
-                discordEventService.waitForJoin(this.guild, this::onJoin);
+
+        if (!this.discordEventService.isInGuild(this.guild)) {
+            Span clickText = new Span("Setup");
+            clickText.addClassNames("box l radius", "guildSetupButton");
+            layout.add(clickText);
+            layout.addClickListener(flexLayoutClickEvent -> flexLayoutClickEvent.getSource().getUI().ifPresent(ui -> {
+                discordEventService.waitForJoin(this.guild, this::navigateToSettingsPage);
 
                 ui.getPage()
-                    .executeJs("window.open(\"https://discord.com/oauth2/authorize?client_id=907572774439112754&scope=bot+applications.commands&permissions=8&guild_id=" + guild.getId() + "\",''," +
-                        "\"width=400,height=700\")");
-            });
-        });
+                    .executeJs(
+                        "window.open(\"https://discord.com/oauth2/authorize?client_id=907572774439112754&scope=bot+applications.commands&permissions=8&guild_id=" + guild.getId() + "\",''," +
+                            "\"width=400,height=700\")");
+            }));
+        } else {
+            Span clickText = new Span("Settings");
+            clickText.addClassNames("box l radius", "guildSetupButton");
+            layout.add(clickText);
+
+            layout.addClickListener(flexLayoutClickEvent -> navigateToSettingsPage(this.guild.getId()));
+        }
 
         return layout;
     }
 
-    private void onJoin(String guildId) {
-        getUI().ifPresent(ui -> {
-            ui.access(() -> {
-                Notification.show("Joined " + guildId);
-                //TODO redirect to settings menu
-            });
-        });
+    private void navigateToSettingsPage(String guildId) {
+        getUI().ifPresent(ui -> ui.access(() -> {
+            Notification.show("Joined " + guildId);
+            //TODO redirect to settings menu
+        }));
     }
 }

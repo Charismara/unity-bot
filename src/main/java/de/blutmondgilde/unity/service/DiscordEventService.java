@@ -3,21 +3,25 @@ package de.blutmondgilde.unity.service;
 import de.blutmondgilde.unity.api.discord.callback.BotJoinedCallback;
 import de.blutmondgilde.unity.data.discordapi.Guild;
 import lombok.extern.slf4j.Slf4j;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Service
 public class DiscordEventService extends ListenerAdapter {
     private final ConcurrentHashMap<String, BotJoinedCallback> waitingGuilds = new ConcurrentHashMap<>();
+    private Optional<JDA> discordBot = Optional.empty();
 
     @Override
     public void onReady(@NotNull ReadyEvent event) {
+        this.discordBot = Optional.of(event.getJDA());
         log.info("Discord Bot successfully initialized");
     }
 
@@ -36,5 +40,10 @@ public class DiscordEventService extends ListenerAdapter {
 
     public void waitForJoin(Guild guild, BotJoinedCallback callback) {
         waitingGuilds.put(guild.getId(), callback);
+    }
+
+    public boolean isInGuild(Guild guild) {
+        if (this.discordBot.isEmpty()) return false;
+        return this.discordBot.get().getGuildById(guild.getId()) != null;
     }
 }
