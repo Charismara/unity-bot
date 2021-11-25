@@ -79,7 +79,7 @@ public class MainView extends VerticalLayout {
             this.guilds.removeAll();
 
             guildList.forEach(guild -> {
-                VerticalLayout guildComponent = guild.createComponent(discordBot);
+                VerticalLayout guildComponent = guild.createComponent(discordEventService);
                 this.guilds.add(guildComponent);
             });
         }));

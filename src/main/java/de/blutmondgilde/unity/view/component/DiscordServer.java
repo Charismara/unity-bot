@@ -3,22 +3,26 @@ package de.blutmondgilde.unity.view.component;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import de.blutmondgilde.unity.data.discordapi.Guild;
+import de.blutmondgilde.unity.service.DiscordEventService;
 
 public class DiscordServer extends VerticalLayout {
     private final Guild guild;
+    private final DiscordEventService discordEventService;
 
-    public DiscordServer(Guild guild) {
+    public DiscordServer(Guild guild, DiscordEventService discordEventService) {
         this.guild = guild;
+        this.discordEventService = discordEventService;
         setPadding(false);
         setMargin(true);
         setMinWidth(180F * 2, Unit.PIXELS);
         setMinHeight(100F * 2, Unit.PIXELS);
         addClassNames("guildComponentContainer", "box l radius");
-        add(imageLayout(),hoverLayout());
+        add(imageLayout(), hoverLayout());
     }
 
     private VerticalLayout imageLayout() {
@@ -56,11 +60,23 @@ public class DiscordServer extends VerticalLayout {
         layout.add(clickText);
         layout.addClickListener(flexLayoutClickEvent -> {
             flexLayoutClickEvent.getSource().getUI().ifPresent(ui -> {
-                ui.getPage().executeJs("window.open(\"https://discord.com/oauth2/authorize?client_id=907572774439112754&scope=bot+applications.commands&permissions=8&guild_id=" + guild.getId() + "\",''," +
-                    "\"width=400,height=700\")");
+                discordEventService.waitForJoin(this.guild, this::onJoin);
+
+                ui.getPage()
+                    .executeJs("window.open(\"https://discord.com/oauth2/authorize?client_id=907572774439112754&scope=bot+applications.commands&permissions=8&guild_id=" + guild.getId() + "\",''," +
+                        "\"width=400,height=700\")");
             });
         });
 
         return layout;
+    }
+
+    private void onJoin(String guildId) {
+        getUI().ifPresent(ui -> {
+            ui.access(() -> {
+                Notification.show("Joined " + guildId);
+                //TODO redirect to settings menu
+            });
+        });
     }
 }

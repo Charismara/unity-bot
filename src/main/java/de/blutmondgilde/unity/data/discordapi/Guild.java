@@ -1,13 +1,13 @@
 package de.blutmondgilde.unity.data.discordapi;
 
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import de.blutmondgilde.unity.service.DiscordEventService;
 import de.blutmondgilde.unity.view.component.DiscordServer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import net.dv8tion.jda.api.JDA;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +32,7 @@ public class Guild {
         return Optional.of("https://cdn.discordapp.com/icons/" + id + "/" + icon + ".png");
     }
 
-    public VerticalLayout createComponent(JDA discordBot) {
-        return new DiscordServer(this);
+    public VerticalLayout createComponent(DiscordEventService discordEventService) {
+        return new DiscordServer(this, discordEventService);
     }
 }
