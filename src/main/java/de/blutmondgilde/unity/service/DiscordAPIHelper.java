@@ -6,6 +6,7 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
+import reactor.util.retry.Retry;
 
 import java.time.Duration;
 
@@ -28,6 +29,7 @@ public class DiscordAPIHelper {
     public Mono<Guild[]> getGuilds() {
         return this.webClient.get().uri("/users/@me/guilds")
             .retrieve()
-            .bodyToMono(Guild[].class);
+            .bodyToMono(Guild[].class)
+            .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(3)));
     }
 }

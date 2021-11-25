@@ -2,6 +2,7 @@ package de.blutmondgilde.unity.data.jpa.stats;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -12,7 +13,7 @@ import java.util.Date;
 @Table(name = "guild_user_amount")
 @Entity
 @IdClass(GuildStatsId.class)
-public class GuildUserAmount {
+public class GuildUserAmount implements Comparable<GuildUserAmount> {
     @Id
     @Setter
     @Getter
@@ -24,4 +25,9 @@ public class GuildUserAmount {
     @Setter
     @Getter
     private int userCount;
+
+    @Override
+    public int compareTo(@NotNull GuildUserAmount o) {
+        return creationDate.compareTo(getCreationDate());
+    }
 }

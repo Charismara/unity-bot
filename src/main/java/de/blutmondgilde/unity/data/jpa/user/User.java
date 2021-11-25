@@ -41,7 +41,7 @@ public class User {
     private String bannerColor;
     @Getter
     @Setter
-    private String accentColor;
+    private int accentColor;
     @Getter
     @Setter
     private String locale;

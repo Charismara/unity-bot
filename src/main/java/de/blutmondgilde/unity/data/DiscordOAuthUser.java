@@ -74,8 +74,22 @@ public class DiscordOAuthUser implements OAuth2User {
     }
 
     @Nullable
-    public String getAccentColor() {
-        return oAuth2User.getAttribute("accent_color");
+    public Integer getAccentColor() {
+        if (oAuth2User.getAttributes().containsKey("accent_color")) {
+            Object accentColor = oAuth2User.getAttribute("accent_color");
+            if (accentColor instanceof Integer) {
+                return (Integer) accentColor;
+            } else {
+                String color = (String) accentColor;
+                if (color == null) {
+                    return 0;
+                } else {
+                    return Integer.parseInt(color);
+                }
+            }
+        } else {
+            return 0;
+        }
     }
 
     public String getLocale() {

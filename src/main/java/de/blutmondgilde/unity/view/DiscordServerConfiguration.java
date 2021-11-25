@@ -4,6 +4,7 @@ import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.charts.Chart;
 import com.vaadin.flow.component.charts.model.ChartType;
 import com.vaadin.flow.component.charts.model.DataSeries;
+import com.vaadin.flow.component.charts.model.DataSeriesItem;
 import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -14,6 +15,8 @@ import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import de.blutmondgilde.unity.data.jpa.guild.GuildSettingsRepository;
+import de.blutmondgilde.unity.data.jpa.stats.GuildUserAmount;
+import de.blutmondgilde.unity.data.jpa.stats.GuildUserStatsRepository;
 import de.blutmondgilde.unity.service.DiscordBotService;
 import de.blutmondgilde.unity.service.SecurityService;
 import de.blutmondgilde.unity.view.component.VerticalPagedTabs;
@@ -26,6 +29,7 @@ import org.vaadin.tabs.PagedTabs;
 
 import javax.annotation.security.PermitAll;
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -39,12 +43,15 @@ public class DiscordServerConfiguration extends HorizontalLayout implements HasU
     private final DiscordBotService discordBotService;
     private final SecurityService securityService;
     private final GuildSettingsRepository guildSettingsRepository;
+    private final GuildUserStatsRepository guildUserStatsRepository;
     private Guild guild;
 
-    public DiscordServerConfiguration(DiscordBotService discordBotService, SecurityService securityService, GuildSettingsRepository guildSettingsRepository) {
+    public DiscordServerConfiguration(DiscordBotService discordBotService, SecurityService securityService, GuildSettingsRepository guildSettingsRepository,
+                                      GuildUserStatsRepository guildUserStatsRepository) {
         this.discordBotService = discordBotService;
         this.securityService = securityService;
         this.guildSettingsRepository = guildSettingsRepository;
+        this.guildUserStatsRepository = guildUserStatsRepository;
         setWidthFull();
     }
 
@@ -78,9 +85,19 @@ public class DiscordServerConfiguration extends HorizontalLayout implements HasU
         userAmountChart.getConfiguration().setTitle("Total Users");
         userAmountChart.getConfiguration().setSubTitle("Shows the total amount of Users on this Server");
         userAmountChart.getConfiguration().getyAxis().setTitle("users");
-        userAmountChart.getConfiguration().getxAxis().setTitle("date");
+        userAmountChart.getConfiguration().getxAxis().setTitle("day");
 
         DataSeries userTimeDataSeries = new DataSeries("Total Users");
+        this.guildUserStatsRepository.findById(this.guild.getIdLong()).ifPresent(guildUserStats -> {
+
+            ArrayList<GuildUserAmount> data = new ArrayList<>(guildUserStats.getUserAmount());
+            data.sort(GuildUserAmount::compareTo);
+            //if(data.size()>)
+
+            for (int i = 0; i < data.size(); i++) {
+                userTimeDataSeries.add(new DataSeriesItem(i + 1, data.get(i).getUserCount()));
+            }
+        });
 
         userAmountChart.getConfiguration().setSeries(userTimeDataSeries);
         userAmountChart.setWidthFull();
@@ -155,11 +172,6 @@ public class DiscordServerConfiguration extends HorizontalLayout implements HasU
 
     @Override
     protected void onAttach(AttachEvent attachEvent) {
-
-    }
-
-    private void updateChart() {
-        //TODO update chart data
 
     }
 }

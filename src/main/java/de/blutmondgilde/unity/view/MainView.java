@@ -8,6 +8,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import de.blutmondgilde.unity.data.AvatarType;
+import de.blutmondgilde.unity.data.DiscordOAuthUser;
 import de.blutmondgilde.unity.data.discordapi.Guild;
 import de.blutmondgilde.unity.data.jpa.guild.GuildSettings;
 import de.blutmondgilde.unity.data.jpa.guild.GuildSettingsRepository;
@@ -15,6 +16,7 @@ import de.blutmondgilde.unity.service.DiscordAPIHelper;
 import de.blutmondgilde.unity.service.DiscordBotService;
 import de.blutmondgilde.unity.service.SecurityService;
 import de.blutmondgilde.unity.view.layout.DefaultLayout;
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 
@@ -30,11 +32,13 @@ import java.util.Optional;
 @PageTitle("Home")
 @Route(layout = DefaultLayout.class)
 @PermitAll
+@Slf4j
 public class MainView extends VerticalLayout {
     final SecurityService securityService;
     final DiscordAPIHelper discordAPIHelper;
     final DiscordBotService discordBotService;
     final GuildSettingsRepository guildSettingsRepository;
+    DiscordOAuthUser currentUser;
 
     MainView(SecurityService securityService, DiscordBotService discordBotService, GuildSettingsRepository guildSettingsRepository) {
         this.securityService = securityService;
@@ -47,11 +51,13 @@ public class MainView extends VerticalLayout {
 
     @PostConstruct
     public void init() {
+        this.currentUser = securityService.getAuthenticatedUser();
+
         Div div = new Div();
-        Paragraph name = new Paragraph("Hallo " + securityService.getAuthenticatedUser().getName());
+        Paragraph name = new Paragraph("Hallo " + currentUser.getName());
         name.addClassName("font-size-xxl");
 
-        div.add(securityService.getAuthenticatedUser().getAvatarImage(AvatarType.WebP), name);
+        div.add(currentUser.getAvatarImage(AvatarType.WebP), name);
 
         guilds.add(new Paragraph("Loading Guilds..."));
         guilds.setJustifyContentMode(JustifyContentMode.AROUND);
@@ -90,20 +96,22 @@ public class MainView extends VerticalLayout {
     }
 
     private boolean hasAccess(Guild guild) {
+        if (getUI().isEmpty()) return false;
         if (guild.isOwner()) return true;
         Optional<net.dv8tion.jda.api.entities.Guild> serviceGuild = discordBotService.getGuild(guild.getId());
         if (serviceGuild.isEmpty()) return false;
 
         net.dv8tion.jda.api.entities.Guild loadedGuild = serviceGuild.get();
-        Member member = loadedGuild.getMemberById(securityService.getAuthenticatedUser().getDiscordId());
-        if (member == null) return false;
+
+        Optional<Member> member = loadedGuild.loadMembers().get().stream().filter(member1 -> member1.getIdLong() == currentUser.getDiscordId()).findFirst();
+        if (member.isEmpty()) return false;
 
         Optional<GuildSettings> loadedSettings = this.guildSettingsRepository.findById(guild.getId());
         if (loadedSettings.isEmpty()) return false;
 
         GuildSettings settings = loadedSettings.get();
 
-        for (Role role : member.getRoles()) {
+        for (Role role : member.get().getRoles()) {
             if (settings.getAllowedRoles().contains(role.getIdLong())) {
                 return true;
             }
