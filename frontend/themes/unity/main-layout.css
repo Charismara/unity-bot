@@ -38,24 +38,31 @@
 .font-size-xxxl {
     font-size: var(--lumo-font-size-xxxl);
 }
+
 .font-size-xxl {
     font-size: var(--lumo-font-size-xxl);
 }
+
 .font-size-xl {
     font-size: var(--lumo-font-size-xl);
 }
+
 .font-size-l {
     font-size: var(--lumo-font-size-l);
 }
+
 .font-size-m {
     font-size: var(--lumo-font-size-m);
 }
+
 .font-size-s {
     font-size: var(--lumo-font-size-s);
 }
+
 .font-size-xs {
     font-size: var(--lumo-font-size-xs);
 }
+
 .font-size-xxs {
     font-size: var(--lumo-font-size-xxs);
 }
@@ -239,4 +246,48 @@
 
 .radius.l {
     border-radius: var(--lumo-border-radius-l);
+}
+
+.guildComponentContainer:hover {
+    transform: scale3d(1.1, 1.1, 1.1);
+}
+
+.guildComponentContainer {
+    position: relative;
+    transform: scale3d(1, 1, 1);
+    transition: transform 150ms ease-in-out 0s;
+}
+
+.guildImageContainer {
+    position: absolute;
+    overflow: hidden;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.guildName {
+    font-size: 2rem;
+    text-align: center;
+}
+
+.guildBlurOnHover {
+    position: absolute;
+    cursor: pointer;
+    transition: opacity 150ms ease-in-out 0s;
+    backdrop-filter: blur(4px);
+    will-change: opacity;
+    background-color: rgba(18, 25, 41, 0.5);
+    text-align: center;
+    opacity: 0;
+}
+
+.guildBlurOnHover:hover {
+    opacity: 1;
+}
+
+.guildSetupButton {
+    background-color: rgb(39, 174, 96);
+    font-size: 1.5rem;
+    padding: 0.25rem 0.5rem;
 }

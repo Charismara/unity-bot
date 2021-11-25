@@ -1,9 +1,9 @@
 
 package de.blutmondgilde.unity.view;
 
-import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Paragraph;
+import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -13,7 +13,7 @@ import de.blutmondgilde.unity.data.discordapi.Guild;
 import de.blutmondgilde.unity.service.DiscordAPIHelper;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import java.util.Arrays;
 import java.util.List;
 
@@ -22,7 +22,7 @@ import java.util.List;
  */
 @PageTitle("Home")
 @Route(layout = DefaultLayout.class)
-@PermitAll
+@RolesAllowed("SCOPE_guilds")
 public class MainView extends VerticalLayout {
     SecurityService securityService;
     DiscordAPIHelper discordAPIHelper;
@@ -32,7 +32,7 @@ public class MainView extends VerticalLayout {
         this.discordAPIHelper = new DiscordAPIHelper(securityService);
     }
 
-    private final Div guilds = new Div();
+    private final FlexLayout guilds = new FlexLayout();
 
     @PostConstruct
     public void init() {
@@ -43,20 +43,21 @@ public class MainView extends VerticalLayout {
         div.add(securityService.getAuthenticatedUser().getAvatarImage(AvatarType.WebP), name);
 
         Div data = new Div();
-        data.setText("Attribute: " + securityService.getAuthenticatedUser().getAttributes().toString());
+        data.setText("Attribute: " + securityService.getAuthenticatedUser().toString());
 
         guilds.add(new Paragraph("Loading Guilds..."));
+        guilds.setJustifyContentMode(JustifyContentMode.AROUND);
+        guilds.setAlignItems(Alignment.STRETCH);
+        guilds.setFlexDirection(FlexLayout.FlexDirection.ROW);
+
         discordAPIHelper.getGuilds()
             .doOnSuccess(this::updateGuildList)
             .doOnError(this::updateGuildListError)
             .retry(3)
             .subscribe();
 
-        Button logout = new Button("Logout");
-        logout.addClickListener(buttonClickEvent -> securityService.logout());
-
         setAlignItems(Alignment.CENTER);
-        add(div, data, guilds, logout);
+        add(div, data, guilds);
     }
 
     private void updateGuildListError(Throwable throwable) {
@@ -70,9 +71,10 @@ public class MainView extends VerticalLayout {
         List<Guild> guildList = Arrays.stream(guildArray).filter(Guild::isOwner).toList();
         getUI().ifPresent(ui -> ui.access(() -> {
             this.guilds.removeAll();
+
             guildList.forEach(guild -> {
-                Paragraph name = new Paragraph(guild.getName());
-                this.guilds.add(name);
+                VerticalLayout guildComponent = guild.createComponent();
+                this.guilds.add(guildComponent);
             });
         }));
     }

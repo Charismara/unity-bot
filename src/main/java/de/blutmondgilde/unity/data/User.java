@@ -18,6 +18,7 @@ public class User {
     @Getter
     @Setter
     private Long id;
+    @Column(length = 33)
     @Getter
     @Setter
     @NotNull
