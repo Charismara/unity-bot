@@ -1,5 +1,6 @@
-package de.blutmondgilde.unity.data;
+package de.blutmondgilde.unity.data.jpa;
 
+import de.blutmondgilde.unity.data.DiscordOAuthUser;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;

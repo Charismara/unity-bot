@@ -10,7 +10,7 @@ import com.vaadin.flow.router.Route;
 import de.blutmondgilde.unity.data.AvatarType;
 import de.blutmondgilde.unity.data.discordapi.Guild;
 import de.blutmondgilde.unity.service.DiscordAPIHelper;
-import de.blutmondgilde.unity.service.DiscordEventService;
+import de.blutmondgilde.unity.service.DiscordBotService;
 import de.blutmondgilde.unity.service.SecurityService;
 
 import javax.annotation.PostConstruct;
@@ -27,11 +27,11 @@ import java.util.List;
 public class MainView extends VerticalLayout {
     final SecurityService securityService;
     final DiscordAPIHelper discordAPIHelper;
-    final DiscordEventService discordEventService;
+    final DiscordBotService discordBotService;
 
-    MainView(SecurityService securityService, DiscordEventService discordEventService) {
+    MainView(SecurityService securityService, DiscordBotService discordBotService) {
         this.securityService = securityService;
-        this.discordEventService = discordEventService;
+        this.discordBotService = discordBotService;
         this.discordAPIHelper = new DiscordAPIHelper(securityService);
     }
 
@@ -73,7 +73,7 @@ public class MainView extends VerticalLayout {
             this.guilds.removeAll();
 
             guildList.forEach(guild -> {
-                VerticalLayout guildComponent = guild.createComponent(discordEventService);
+                VerticalLayout guildComponent = guild.createComponent(discordBotService);
                 this.guilds.add(guildComponent);
             });
         }));

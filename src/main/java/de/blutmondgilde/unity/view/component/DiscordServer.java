@@ -7,16 +7,16 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import de.blutmondgilde.unity.data.discordapi.Guild;
-import de.blutmondgilde.unity.service.DiscordEventService;
+import de.blutmondgilde.unity.service.DiscordBotService;
 import de.blutmondgilde.unity.view.DiscordServerConfiguration;
 
 public class DiscordServer extends VerticalLayout {
     private final Guild guild;
-    private final DiscordEventService discordEventService;
+    private final DiscordBotService discordBotService;
 
-    public DiscordServer(Guild guild, DiscordEventService discordEventService) {
+    public DiscordServer(Guild guild, DiscordBotService discordBotService) {
         this.guild = guild;
-        this.discordEventService = discordEventService;
+        this.discordBotService = discordBotService;
         setPadding(false);
         setMargin(true);
         setMinWidth(180F * 2, Unit.PIXELS);
@@ -55,12 +55,12 @@ public class DiscordServer extends VerticalLayout {
         layout.addClassName("guildBlurOnHover");
 
 
-        if (!this.discordEventService.isInGuild(this.guild)) {
+        if (!this.discordBotService.isInGuild(this.guild)) {
             Span clickText = new Span("Setup");
             clickText.addClassNames("box l radius", "guildSetupButton");
             layout.add(clickText);
             layout.addClickListener(flexLayoutClickEvent -> flexLayoutClickEvent.getSource().getUI().ifPresent(ui -> {
-                discordEventService.waitForJoin(this.guild, this::navigateToSettingsPage);
+                discordBotService.waitForJoin(this.guild, this::updatePage);
 
                 ui.getPage()
                     .executeJs(
@@ -78,7 +78,15 @@ public class DiscordServer extends VerticalLayout {
         return layout;
     }
 
+    private void updatePage(String guildId) {
+        getUI().ifPresent(ui -> {
+            ui.getSession().lock();
+            ui.getPage().reload();
+            ui.getSession().unlock();
+        });
+    }
+
     private void navigateToSettingsPage(String guildId) {
-        getUI().ifPresent(ui -> ui.navigate(DiscordServerConfiguration.class));
+        getUI().ifPresent(ui -> ui.navigate(DiscordServerConfiguration.class, guildId));
     }
 }

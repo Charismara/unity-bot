@@ -1,4 +1,4 @@
-package de.blutmondgilde.unity.data;
+package de.blutmondgilde.unity.data.jpa;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
