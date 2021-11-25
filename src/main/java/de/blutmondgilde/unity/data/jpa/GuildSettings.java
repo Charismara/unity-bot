@@ -5,6 +5,7 @@ import lombok.Setter;
 
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.List;
@@ -21,6 +22,6 @@ public class GuildSettings {
     private Long owner;
     @Setter
     @Getter
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     private List<Long> allowedRoles;
 }
