@@ -7,12 +7,11 @@ import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import de.blutmondgilde.unity.service.DiscordEventService;
-import de.blutmondgilde.unity.service.SecurityService;
 import de.blutmondgilde.unity.data.AvatarType;
 import de.blutmondgilde.unity.data.discordapi.Guild;
 import de.blutmondgilde.unity.service.DiscordAPIHelper;
-import net.dv8tion.jda.api.JDA;
+import de.blutmondgilde.unity.service.DiscordEventService;
+import de.blutmondgilde.unity.service.SecurityService;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.security.PermitAll;
@@ -27,13 +26,11 @@ import java.util.List;
 @PermitAll
 public class MainView extends VerticalLayout {
     final SecurityService securityService;
-    final JDA discordBot;
     final DiscordAPIHelper discordAPIHelper;
     final DiscordEventService discordEventService;
 
-    MainView(SecurityService securityService, JDA discordBot, DiscordEventService discordEventService) {
+    MainView(SecurityService securityService, DiscordEventService discordEventService) {
         this.securityService = securityService;
-        this.discordBot = discordBot;
         this.discordEventService = discordEventService;
         this.discordAPIHelper = new DiscordAPIHelper(securityService);
     }
