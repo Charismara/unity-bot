@@ -5,6 +5,7 @@ import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import de.blutmondgilde.unity.view.layout.DefaultLayout;
 import org.springframework.beans.factory.annotation.Value;
 
 import javax.annotation.PostConstruct;

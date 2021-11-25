@@ -9,14 +9,20 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import de.blutmondgilde.unity.data.AvatarType;
 import de.blutmondgilde.unity.data.discordapi.Guild;
+import de.blutmondgilde.unity.data.jpa.GuildSettings;
+import de.blutmondgilde.unity.data.jpa.GuildSettingsRepository;
 import de.blutmondgilde.unity.service.DiscordAPIHelper;
 import de.blutmondgilde.unity.service.DiscordBotService;
 import de.blutmondgilde.unity.service.SecurityService;
+import de.blutmondgilde.unity.view.layout.DefaultLayout;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.security.PermitAll;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Application main class that is hidden to user before authentication.
@@ -28,11 +34,13 @@ public class MainView extends VerticalLayout {
     final SecurityService securityService;
     final DiscordAPIHelper discordAPIHelper;
     final DiscordBotService discordBotService;
+    final GuildSettingsRepository guildSettingsRepository;
 
-    MainView(SecurityService securityService, DiscordBotService discordBotService) {
+    MainView(SecurityService securityService, DiscordBotService discordBotService, GuildSettingsRepository guildSettingsRepository) {
         this.securityService = securityService;
         this.discordBotService = discordBotService;
         this.discordAPIHelper = new DiscordAPIHelper(securityService);
+        this.guildSettingsRepository = guildSettingsRepository;
     }
 
     private final FlexLayout guilds = new FlexLayout();
@@ -68,7 +76,9 @@ public class MainView extends VerticalLayout {
     }
 
     private void updateGuildList(Guild[] guildArray) {
-        List<Guild> guildList = Arrays.stream(guildArray).filter(Guild::isOwner).toList();
+        List<Guild> guildList = Arrays.stream(guildArray)
+            .filter(this::hasAccess)
+            .toList();
         getUI().ifPresent(ui -> ui.access(() -> {
             this.guilds.removeAll();
 
@@ -79,5 +89,26 @@ public class MainView extends VerticalLayout {
         }));
     }
 
+    private boolean hasAccess(Guild guild) {
+        if (guild.isOwner()) return true;
+        Optional<net.dv8tion.jda.api.entities.Guild> serviceGuild = discordBotService.getGuild(guild.getId());
+        if (serviceGuild.isEmpty()) return false;
 
+        net.dv8tion.jda.api.entities.Guild loadedGuild = serviceGuild.get();
+        Member member = loadedGuild.getMemberById(securityService.getAuthenticatedUser().getDiscordId());
+        if (member == null) return false;
+
+        Optional<GuildSettings> loadedSettings = this.guildSettingsRepository.findById(guild.getId());
+        if (loadedSettings.isEmpty()) return false;
+
+        GuildSettings settings = loadedSettings.get();
+
+        for (Role role : member.getRoles()) {
+            if (settings.getAllowedRoles().contains(role.getIdLong())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

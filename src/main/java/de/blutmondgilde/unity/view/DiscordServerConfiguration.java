@@ -14,6 +14,7 @@ import de.blutmondgilde.unity.data.jpa.GuildSettingsRepository;
 import de.blutmondgilde.unity.service.DiscordBotService;
 import de.blutmondgilde.unity.service.SecurityService;
 import de.blutmondgilde.unity.view.component.VerticalPagedTabs;
+import de.blutmondgilde.unity.view.layout.DefaultLayout;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;

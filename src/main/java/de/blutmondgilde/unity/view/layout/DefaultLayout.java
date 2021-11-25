@@ -1,4 +1,4 @@
-package de.blutmondgilde.unity.view;
+package de.blutmondgilde.unity.view.layout;
 
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.avatar.Avatar;
