@@ -85,7 +85,9 @@ public class DiscordServerConfiguration extends HorizontalLayout implements HasU
         userAmountChart.getConfiguration().setTitle("Total Users");
         userAmountChart.getConfiguration().setSubTitle("Shows the total amount of Users on this Server");
         userAmountChart.getConfiguration().getyAxis().setTitle("users");
+        userAmountChart.getConfiguration().getyAxis().setAllowDecimals(false);
         userAmountChart.getConfiguration().getxAxis().setTitle("day");
+        userAmountChart.getConfiguration().getxAxis().setAllowDecimals(false);
 
         DataSeries userTimeDataSeries = new DataSeries("Total Users");
         this.guildUserStatsRepository.findById(this.guild.getIdLong()).ifPresent(guildUserStats -> {
@@ -101,6 +103,7 @@ public class DiscordServerConfiguration extends HorizontalLayout implements HasU
 
         userAmountChart.getConfiguration().setSeries(userTimeDataSeries);
         userAmountChart.setWidthFull();
+        userAmountChart.addClassName("styled-chart");
         layout.add(userAmountChart);
 
         return layout;
