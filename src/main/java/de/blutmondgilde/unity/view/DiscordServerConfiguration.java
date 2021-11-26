@@ -81,6 +81,13 @@ public class DiscordServerConfiguration extends HorizontalLayout implements HasU
         VerticalLayout layout = new VerticalLayout();
         layout.addClassNames("box l radius", "contrast-5pct");
 
+        Span title = new Span("Statistics");
+        title.addClassNames("header-text", "font-size-xxl");
+        layout.add(title);
+
+        Hr titleLine = new Hr();
+        layout.add(titleLine);
+
         Chart userAmountChart = new Chart(ChartType.LINE);
         userAmountChart.getConfiguration().setTitle("Total Users");
         userAmountChart.getConfiguration().setSubTitle("Shows the total amount of Users on this Server");
