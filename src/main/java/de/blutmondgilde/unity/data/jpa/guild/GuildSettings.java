@@ -7,6 +7,7 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.util.List;
 
@@ -24,4 +25,9 @@ public class GuildSettings {
     @Getter
     @ElementCollection(fetch = FetchType.EAGER)
     private List<Long> allowedRoles;
+
+    @Setter
+    @Getter
+    @OneToMany(mappedBy = "guildId")
+    private List<GuildTempChannelSettings> tempChannelSettings;
 }

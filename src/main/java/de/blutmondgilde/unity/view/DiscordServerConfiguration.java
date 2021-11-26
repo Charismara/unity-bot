@@ -1,24 +1,39 @@
 package de.blutmondgilde.unity.view;
 
 import com.vaadin.flow.component.AttachEvent;
+import com.vaadin.flow.component.Html;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.charts.Chart;
 import com.vaadin.flow.component.charts.model.ChartType;
 import com.vaadin.flow.component.charts.model.DataSeries;
 import com.vaadin.flow.component.charts.model.DataSeriesItem;
+import com.vaadin.flow.component.crud.BinderCrudEditor;
+import com.vaadin.flow.component.crud.Crud;
+import com.vaadin.flow.component.crud.CrudEditor;
+import com.vaadin.flow.component.crud.CrudGrid;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import de.blutmondgilde.unity.data.jpa.guild.GuildSettingsRepository;
+import de.blutmondgilde.unity.data.jpa.guild.GuildTempChannelSettings;
+import de.blutmondgilde.unity.data.jpa.guild.GuildTempChannelSettingsRepository;
 import de.blutmondgilde.unity.data.jpa.stats.GuildUserAmount;
 import de.blutmondgilde.unity.data.jpa.stats.GuildUserStatsRepository;
 import de.blutmondgilde.unity.service.DiscordBotService;
 import de.blutmondgilde.unity.service.SecurityService;
+import de.blutmondgilde.unity.view.component.GuildTempChannelSettingsDataProvider;
 import de.blutmondgilde.unity.view.component.VerticalPagedTabs;
 import de.blutmondgilde.unity.view.layout.DefaultLayout;
 import lombok.extern.slf4j.Slf4j;
@@ -44,14 +59,16 @@ public class DiscordServerConfiguration extends HorizontalLayout implements HasU
     private final SecurityService securityService;
     private final GuildSettingsRepository guildSettingsRepository;
     private final GuildUserStatsRepository guildUserStatsRepository;
+    private final GuildTempChannelSettingsRepository guildTempChannelSettingsRepository;
     private Guild guild;
 
     public DiscordServerConfiguration(DiscordBotService discordBotService, SecurityService securityService, GuildSettingsRepository guildSettingsRepository,
-                                      GuildUserStatsRepository guildUserStatsRepository) {
+                                      GuildUserStatsRepository guildUserStatsRepository, GuildTempChannelSettingsRepository guildTempChannelSettingsRepository) {
         this.discordBotService = discordBotService;
         this.securityService = securityService;
         this.guildSettingsRepository = guildSettingsRepository;
         this.guildUserStatsRepository = guildUserStatsRepository;
+        this.guildTempChannelSettingsRepository = guildTempChannelSettingsRepository;
         setWidthFull();
     }
 
@@ -61,7 +78,7 @@ public class DiscordServerConfiguration extends HorizontalLayout implements HasU
         tabs.add("Statistics", createStatsOverview(), false);
         tabs.add("Polls", createEmptyContainer(), false);
         tabs.add("Reaction Rolls", createEmptyContainer(), false);
-        tabs.add("Temporary Channels", createEmptyContainer(), false);
+        tabs.add("Temporary Channels", createTemporaryChannelSettings(), false);
 
         if (securityService.getAuthenticatedUser().getDiscordId() == guild.getOwnerIdLong()) {
             tabs.add("Panel Settings", createPanelSettings(), false);
@@ -83,6 +100,51 @@ public class DiscordServerConfiguration extends HorizontalLayout implements HasU
 
         return layout;
     }
+
+    private VerticalLayout createTemporaryChannelSettings() {
+        VerticalLayout layout = new VerticalLayout();
+        layout.addClassNames("box l radius", "contrast-5pct");
+
+        Span title = new Span("Comming Soon");
+        title.addClassNames("header-text", "font-size-xxl");
+        layout.add(title);
+
+        Hr titleLine = new Hr();
+        layout.add(titleLine);
+
+        Crud<GuildTempChannelSettings> crud = new Crud<>(GuildTempChannelSettings.class, createGrid(), createCrudEditor());
+
+        GuildTempChannelSettingsDataProvider dataProvider = new GuildTempChannelSettingsDataProvider(this.guildTempChannelSettingsRepository, this.guild.getIdLong());
+        crud.setDataProvider(dataProvider);
+        crud.addDeleteListener(deleteEvent -> {
+            //TODO delete channel
+            this.guildTempChannelSettingsRepository.delete(deleteEvent.getItem());
+        });
+        crud.addSaveListener(saveEvent -> {
+            //TODO create channel
+            this.guildTempChannelSettingsRepository.save(saveEvent.getItem());
+        });
+
+
+        layout.add(crud);
+
+        Html total = new Html("<span>Total: <b>" + this.guildTempChannelSettingsRepository.findByGuildId(this.guild.getIdLong()).size() + "</b> employees</span>");
+
+        Button button = new Button("New", VaadinIcon.PLUS.create());
+        button.addClickListener(event -> crud.edit(new GuildTempChannelSettings(), Crud.EditMode.NEW_ITEM));
+        button.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+
+        HorizontalLayout toolbar = new HorizontalLayout(total, button);
+        toolbar.setAlignItems(FlexComponent.Alignment.CENTER);
+        toolbar.setFlexGrow(1, toolbar);
+        toolbar.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
+        toolbar.setSpacing(false);
+
+        crud.setToolbar(toolbar);
+
+        return layout;
+    }
+
 
     private VerticalLayout createStatsOverview() {
         VerticalLayout layout = new VerticalLayout();
@@ -185,6 +247,33 @@ public class DiscordServerConfiguration extends HorizontalLayout implements HasU
             this.guild = optionalGuild.get();
             initializeContent();
         }
+    }
+
+    private CrudEditor<GuildTempChannelSettings> createCrudEditor() {
+        TextField channelName = new TextField("Channel Name");
+
+        FormLayout form = new FormLayout();
+        form.add(channelName);
+
+        Binder<GuildTempChannelSettings> binder = new Binder<>(GuildTempChannelSettings.class);
+        binder.forField(channelName).asRequired().bind(GuildTempChannelSettings::getChannelName, GuildTempChannelSettings::setChannelName);
+
+        return new BinderCrudEditor<>(binder, form);
+    }
+
+    private CrudGrid<GuildTempChannelSettings> createGrid() {
+        CrudGrid<GuildTempChannelSettings> grid = new CrudGrid<>(GuildTempChannelSettings.class, false);
+        grid.setSortableColumns();
+
+        List<String> keys = List.of("channelName", "vaadin-crud-edit-column");
+
+        grid.getColumns().forEach(column -> {
+            if (!keys.contains(column.getKey())) {
+                grid.removeColumn(column);
+            }
+        });
+
+        return grid;
     }
 
     @Override
