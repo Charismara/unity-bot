@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Field;
 import java.util.Comparator;
+import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -29,16 +30,16 @@ public class GuildTempChannelSettingsDataProvider extends AbstractBackEndDataPro
         int offset = query.getOffset();
         int limit = query.getLimit();
 
-        Stream<GuildTempChannelSettings> stream = tempChannelSettingsRepository.findByGuildId(this.guildId).stream();
-        log.info("Found {} entries", stream.count());
+        List<GuildTempChannelSettings> settingsList = tempChannelSettingsRepository.findByGuildId(this.guildId);
 
         if (query.getFilter().isPresent()) {
-            stream = stream
+            settingsList = settingsList.stream()
                 .filter(predicate(query.getFilter().get()))
-                .sorted(comparator(query.getFilter().get()));
+                .sorted(comparator(query.getFilter().get()))
+                .toList();
         }
 
-        return stream.skip(offset).limit(limit);
+        return settingsList.stream().skip(offset).limit(limit);
     }
 
     @Override

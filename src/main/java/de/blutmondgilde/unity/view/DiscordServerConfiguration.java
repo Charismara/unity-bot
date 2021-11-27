@@ -124,6 +124,7 @@ public class DiscordServerConfiguration extends HorizontalLayout implements HasU
             //TODO create channel
             this.guildTempChannelSettingsRepository.save(saveEvent.getItem());
         });
+        crud.addNewListener(newEvent -> newEvent.getItem().setGuildId(this.guild.getIdLong()));
 
 
         layout.add(crud);
