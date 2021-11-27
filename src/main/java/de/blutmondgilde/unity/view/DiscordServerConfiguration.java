@@ -16,6 +16,7 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -39,6 +40,7 @@ import de.blutmondgilde.unity.view.layout.DefaultLayout;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.VoiceChannel;
 import org.vaadin.gatanaso.MultiselectComboBox;
 import org.vaadin.tabs.PagedTabs;
 
@@ -117,19 +119,48 @@ public class DiscordServerConfiguration extends HorizontalLayout implements HasU
         GuildTempChannelSettingsDataProvider dataProvider = new GuildTempChannelSettingsDataProvider(this.guildTempChannelSettingsRepository, this.guild.getIdLong());
         crud.setDataProvider(dataProvider);
         crud.addDeleteListener(deleteEvent -> {
-            //TODO delete channel
-            this.guildTempChannelSettingsRepository.delete(deleteEvent.getItem());
+            GuildTempChannelSettings settings = deleteEvent.getItem();
+
+            VoiceChannel channel = (VoiceChannel) guild.getGuildChannelById(settings.getChannelId());
+
+            if (channel == null) {
+                //TODO error notification and handling
+                Notification.show("Could not find Channel.");
+            } else {
+                channel.delete().queue();
+            }
+
+            this.guildTempChannelSettingsRepository.delete(settings);
         });
         crud.addSaveListener(saveEvent -> {
-            //TODO create channel
-            this.guildTempChannelSettingsRepository.save(saveEvent.getItem());
+            GuildTempChannelSettings settings = saveEvent.getItem();
+
+            VoiceChannel channel;
+            if (settings.getChannelId() == 0) {
+                channel = guild.createVoiceChannel(settings.getChannelName()).setBitrate(8000).complete();
+                settings.setChannelId(channel.getIdLong());
+            } else {
+                channel = (VoiceChannel) guild.getGuildChannelById(settings.getChannelId());
+            }
+
+            if (channel == null) {
+                //TODO error notification and handling
+                Notification.show("Could not find Channel.");
+            } else {
+                //TODO update channel
+                channel.getManager()
+                    .setName(settings.getChannelName())
+                    .queue();
+            }
+
+            this.guildTempChannelSettingsRepository.save(settings);
         });
         crud.addNewListener(newEvent -> newEvent.getItem().setGuildId(this.guild.getIdLong()));
 
 
         layout.add(crud);
 
-        Html total = new Html("<span>Total: <b>" + this.guildTempChannelSettingsRepository.findByGuildId(this.guild.getIdLong()).size() + "</b> employees</span>");
+        Html total = new Html("<span>Total: <b>" + this.guildTempChannelSettingsRepository.findByGuildId(this.guild.getIdLong()).size() + "</b> channel</span>");
 
         Button button = new Button("New", VaadinIcon.PLUS.create());
         button.addClickListener(event -> crud.edit(new GuildTempChannelSettings(), Crud.EditMode.NEW_ITEM));
