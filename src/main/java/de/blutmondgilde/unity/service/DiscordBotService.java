@@ -4,6 +4,7 @@ import de.blutmondgilde.unity.api.discord.callback.BotJoinedCallback;
 import de.blutmondgilde.unity.data.discordapi.Guild;
 import de.blutmondgilde.unity.data.jpa.guild.GuildSettings;
 import de.blutmondgilde.unity.data.jpa.guild.GuildSettingsRepository;
+import de.blutmondgilde.unity.data.jpa.guild.GuildTempChannelSettingsRepository;
 import de.blutmondgilde.unity.data.jpa.stats.GuildUserAmount;
 import de.blutmondgilde.unity.data.jpa.stats.GuildUserAmountRepository;
 import de.blutmondgilde.unity.data.jpa.stats.GuildUserStats;
@@ -12,8 +13,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -32,6 +35,7 @@ public class DiscordBotService extends ListenerAdapter {
     private final GuildSettingsRepository guildSettingsRepository;
     private final GuildUserAmountRepository userAmountRepository;
     private final GuildUserStatsRepository userStatsRepository;
+    private final GuildTempChannelSettingsRepository tempChannelSettingsRepository;
 
     @Override
     public void onReady(@NotNull ReadyEvent event) {
@@ -100,6 +104,20 @@ public class DiscordBotService extends ListenerAdapter {
                 //save timestamp
                 userAmountRepository.save(userAmount);
             });
+        });
+    }
+
+    @Override
+    public void onGuildVoiceJoin(@NotNull GuildVoiceJoinEvent event) {
+        tempChannelSettingsRepository.findByChannelId(event.getChannelJoined().getIdLong()).ifPresent(settings -> {
+            VoiceChannel channel = event.getChannelJoined();
+            //replace placeholder
+            String name = settings.getChannelTemplate().getChannelNameTemplate();
+            name = name.replaceAll("[{]index[}]", String.valueOf(settings.getChannelInfos().size() + 1));
+            String username = event.getMember().getNickname();
+            name = name.replaceAll("[{]username[}]", username != null ? username : "Unknown");
+
+            log.info("Could create channel from {} with name {}", username, name);
         });
     }
 }

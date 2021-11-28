@@ -14,9 +14,9 @@ import com.vaadin.flow.component.crud.CrudEditor;
 import com.vaadin.flow.component.crud.CrudGrid;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Hr;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -27,6 +27,7 @@ import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import de.blutmondgilde.unity.data.jpa.guild.GuildChannelTemplate;
 import de.blutmondgilde.unity.data.jpa.guild.GuildSettingsRepository;
 import de.blutmondgilde.unity.data.jpa.guild.GuildTempChannelSettings;
 import de.blutmondgilde.unity.data.jpa.guild.GuildTempChannelSettingsRepository;
@@ -41,6 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.VoiceChannel;
+import org.vaadin.addon.sliders.PaperSlider;
 import org.vaadin.gatanaso.MultiselectComboBox;
 import org.vaadin.tabs.PagedTabs;
 
@@ -123,10 +125,7 @@ public class DiscordServerConfiguration extends HorizontalLayout implements HasU
 
             VoiceChannel channel = (VoiceChannel) guild.getGuildChannelById(settings.getChannelId());
 
-            if (channel == null) {
-                //TODO error notification and handling
-                Notification.show("Could not find Channel.");
-            } else {
+            if (channel != null) {
                 channel.delete().queue();
             }
 
@@ -135,23 +134,16 @@ public class DiscordServerConfiguration extends HorizontalLayout implements HasU
         crud.addSaveListener(saveEvent -> {
             GuildTempChannelSettings settings = saveEvent.getItem();
 
-            VoiceChannel channel;
-            if (settings.getChannelId() == 0) {
-                channel = guild.createVoiceChannel(settings.getChannelName()).setBitrate(8000).complete();
-                settings.setChannelId(channel.getIdLong());
-            } else {
-                channel = (VoiceChannel) guild.getGuildChannelById(settings.getChannelId());
-            }
+            VoiceChannel channel = (VoiceChannel) guild.getGuildChannelById(settings.getChannelId());
 
             if (channel == null) {
-                //TODO error notification and handling
-                Notification.show("Could not find Channel.");
-            } else {
-                //TODO update channel
-                channel.getManager()
-                    .setName(settings.getChannelName())
-                    .queue();
+                channel = guild.createVoiceChannel(settings.getChannelName()).setBitrate(8000).complete();
+                settings.setChannelId(channel.getIdLong());
             }
+
+            channel.getManager()
+                .setName(settings.getChannelName())
+                .queue();
 
             this.guildTempChannelSettingsRepository.save(settings);
         });
@@ -163,7 +155,11 @@ public class DiscordServerConfiguration extends HorizontalLayout implements HasU
         Html total = new Html("<span>Total: <b>" + this.guildTempChannelSettingsRepository.findByGuildId(this.guild.getIdLong()).size() + "</b> channel</span>");
 
         Button button = new Button("New", VaadinIcon.PLUS.create());
-        button.addClickListener(event -> crud.edit(new GuildTempChannelSettings(), Crud.EditMode.NEW_ITEM));
+        button.addClickListener(event -> {
+            GuildTempChannelSettings settings = new GuildTempChannelSettings();
+            settings.setChannelTemplate(new GuildChannelTemplate());
+            crud.edit(settings, Crud.EditMode.NEW_ITEM);
+        });
         button.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
 
         HorizontalLayout toolbar = new HorizontalLayout(total, button);
@@ -282,13 +278,28 @@ public class DiscordServerConfiguration extends HorizontalLayout implements HasU
     }
 
     private CrudEditor<GuildTempChannelSettings> createCrudEditor() {
-        TextField channelName = new TextField("Channel Name");
+        //Hub name
+        TextField channelName = new TextField("Hub Channel Name");
+        //Channel Name
+        TextField channelNameTemplate = new TextField("Channel Name Template");
+        //Bitrate
+        VerticalLayout bitRateSliderLayout = new VerticalLayout();
+        Label bitRateSliderLabel = new Label("Bitrate");
+        PaperSlider bitRateSlider = new PaperSlider(8, guild.getMaxBitrate(), 8);
+        bitRateSliderLayout.add(bitRateSliderLabel, bitRateSlider);
+
 
         FormLayout form = new FormLayout();
         form.add(channelName);
+        form.add(new Hr());
+        form.add(channelNameTemplate);
+        form.add(bitRateSliderLayout);
 
         Binder<GuildTempChannelSettings> binder = new Binder<>(GuildTempChannelSettings.class);
         binder.forField(channelName).asRequired().bind(GuildTempChannelSettings::getChannelName, GuildTempChannelSettings::setChannelName);
+        binder.forField(channelNameTemplate).asRequired()
+            .bind(settings -> settings.getChannelTemplate().getChannelNameTemplate(), (settings, s) -> settings.getChannelTemplate().setChannelNameTemplate(s));
+        binder.forField(bitRateSlider).bind(settings -> settings.getChannelTemplate().getBitRate(), (settings, integer) -> settings.getChannelTemplate().setBitRate(integer));
 
         return new BinderCrudEditor<>(binder, form);
     }
