@@ -1,14 +1,14 @@
 import '../styles/globals.css'
 import type {AppProps} from 'next/app'
-import {DevSupport} from "@react-buddy/ide-toolbox";
-import {ComponentPreviews, useInitial} from "../dev";
+import {SessionProvider} from "next-auth/react";
+import {Session} from "next-auth";
 
-function MyApp({Component, pageProps}: AppProps) {
-    return <DevSupport ComponentPreviews={ComponentPreviews}
-                       useInitialHook={useInitial}
-    >
-        <Component {...pageProps} />
-    </DevSupport>
+function App({Component, pageProps}: AppProps<{ session: Session }>) {
+    return (
+        <SessionProvider session={pageProps.session}>
+            <Component {...pageProps} />
+        </SessionProvider>
+    )
 }
 
-export default MyApp
+export default App

@@ -10,6 +10,7 @@ import {
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import LogoPng from '../public/logo-512x512.png'
+import {LoginButton} from "./LoginButton";
 
 type Props = {
     children?: ReactNode,
@@ -111,13 +112,8 @@ export default function DefaultPageContainer({children, title}: Props) {
                             ))}
                         </Popover.Group>
                         <div className="hidden items-center justify-end md:flex md:flex-1 lg:w-0">
-                            <Link href={"/login"}>
-                                <a
-                                    className="ml-8 inline-flex items-center justify-center whitespace-nowrap rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700"
-                                >
-                                    Login with Discord
-                                </a>
-                            </Link>
+                            <LoginButton
+                                className="ml-8 inline-flex items-center justify-center whitespace-nowrap rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700"/>
                         </div>
                     </div>
                 </div>
@@ -166,13 +162,7 @@ export default function DefaultPageContainer({children, title}: Props) {
                                 </div>
                             </div>
                             <div className="space-y-6 py-6 px-5">
-                                <Link href={"/login"}>
-                                    <a
-                                        className="flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700"
-                                    >
-                                        Login with Discord
-                                    </a>
-                                </Link>
+                                <LoginButton className={"flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700"}/>
                             </div>
                         </div>
                     </Popover.Panel>
