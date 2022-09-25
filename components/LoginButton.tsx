@@ -36,7 +36,7 @@ export function LoginButton(props: Props) {
             managementControls.push({
                 title: "Bot Moderation",
                 icon: ShieldCheckIcon,
-                href: "#"
+                href: "/moderation/bot"
             })
         }
 
@@ -44,7 +44,7 @@ export function LoginButton(props: Props) {
             managementControls.push({
                 title: "User Moderation",
                 icon: ShieldExclamationIcon,
-                href: "#"
+                href: "/moderation/users"
             })
         }
 
@@ -76,19 +76,20 @@ export function LoginButton(props: Props) {
                                         return (
                                             <Menu.Item key={item.title}>
                                                 {({active}) => (
-                                                    <Link href={item.href}>
-                                                        <a
-                                                            href="#"
-                                                            className={classNames(
-                                                                active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
-                                                                'group flex items-center px-4 py-2 text-sm'
-                                                            )}
-                                                        >
-                                                            <item.icon className="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500"
-                                                                       aria-hidden="true"/>
-                                                            {item.title}
-                                                        </a>
-                                                    </Link>
+                                                    <div className={classNames(
+                                                        active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
+                                                        'group flex items-center px-4 py-2 text-sm'
+                                                    )}>
+                                                        <Link href={item.href}>
+                                                            <a
+                                                                className={'group flex items-center text-sm'}
+                                                            >
+                                                                <item.icon className="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500"
+                                                                           aria-hidden="true"/>
+                                                                {item.title}
+                                                            </a>
+                                                        </Link>
+                                                    </div>
                                                 )}
                                             </Menu.Item>
                                         )
@@ -98,16 +99,17 @@ export function LoginButton(props: Props) {
                             <div className="py-1">
                                 <Menu.Item>
                                     {({active}) => (
-                                        <a
-                                            href="#"
-                                            className={classNames(
-                                                active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
-                                                'group flex items-center px-4 py-2 text-sm'
-                                            )}
-                                        >
-                                            <PencilSquareIcon className="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500" aria-hidden="true"/>
-                                            Server Management
-                                        </a>
+                                        <div className={classNames(
+                                            active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
+                                            'group flex items-center px-4 py-2 text-sm'
+                                        )}>
+                                            <Link href={"/servers"}>
+                                                <a className={'group flex items-center text-sm'}>
+                                                    <PencilSquareIcon className="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500" aria-hidden="true"/>
+                                                    Server Management
+                                                </a>
+                                            </Link>
+                                        </div>
                                     )}
                                 </Menu.Item>
                             </div>
