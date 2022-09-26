@@ -1,6 +1,6 @@
 import {Popover, Transition} from "@headlessui/react";
 import Head from "next/head";
-import {Fragment, ReactNode} from "react";
+import {Fragment, ReactChild, ReactElement, ReactNode} from "react";
 import {
     AcademicCapIcon,
     Bars3Icon,
@@ -10,10 +10,10 @@ import {
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import LogoPng from '../public/logo-512x512.png'
-import {LoginButton} from "./LoginButton";
+import {LoginButton} from "./login/LoginButton";
 
 type Props = {
-    children?: ReactNode,
+    children?: ReactNode
     title: string
 }
 

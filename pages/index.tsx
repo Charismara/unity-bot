@@ -3,11 +3,9 @@ import DefaultPageContainer from "../components/DefaultPageContainer";
 
 const Home: NextPage = () => {
     return (
-        <div>
-            <DefaultPageContainer title={"Home"}>
+        <DefaultPageContainer title={"Home"}>
 
-            </DefaultPageContainer>
-        </div>
+        </DefaultPageContainer>
     )
 }
 
