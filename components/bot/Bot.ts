@@ -11,6 +11,7 @@ export class Bot {
                     GatewayIntentBits.Guilds
                 ]
             });
+            await this.start();
         }
 
         return Bot.BOT;

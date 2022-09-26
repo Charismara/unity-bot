@@ -1,23 +1,24 @@
 import {NextApiRequest, NextApiResponse} from "next";
-import {Bot} from "../../../components/bot/Bot";
 import {getSession} from "next-auth/react";
+import {Bot} from "../../../../components/bot/Bot";
+import {Guild} from "discord.js";
 
-export type BotStatus = {
-    isReady?: boolean,
-    message?: string
+export type BotGuilds = {
+    message?: string,
+    guilds?: Guild[]
 }
 
-export default async function handle(req: NextApiRequest, res: NextApiResponse<BotStatus>) {
+export default async function handle(req: NextApiRequest, res: NextApiResponse<BotGuilds>) {
     const session = await getSession({req})
     const bot = await Bot.getBot();
-    //Get Bot Status
+
     if (req.method === 'GET') {
         if (session) {
-            if (session.user?.role === "MODERATOR" || session.user?.role === "ADMIN") {
-                res.status(200).json({isReady: bot.isReady()})
+            if (session.user?.role === "ADMIN") {
+                res.status(200).json({guilds: bot.guilds.cache.toJSON()})
             } else {
-                res.status(403).json({
-                    message: "You don't have permission to access this API"
+                res.status(200).json({
+                    guilds: bot.guilds.cache.filter(value => false).toJSON() //TODO access control
                 })
             }
         } else {

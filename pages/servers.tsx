@@ -1,22 +1,25 @@
-import {GetServerSideProps, InferGetServerSidePropsType, NextPage} from "next";
+import {NextPage} from "next";
 import DefaultPageContainer from "../components/DefaultPageContainer";
 import {useSession} from "next-auth/react";
 import {LoadingSpinner} from "../components/loading/LoadingSpinner";
 import {useRouter} from "next/router";
-import {useEffect} from "react";
-import {useGetUserGuilds} from "../components/util/DiscordAPIRequest";
-import {Bot} from "../components/bot/Bot";
+import {useEffect, useState} from "react";
+import {UserGuildGrid} from "../components/discord/UserGuildGrid";
 
-const Servers: NextPage = ({data, test}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const Servers: NextPage = () => {
     const {data: session, status} = useSession();
     const router = useRouter();
-    const {guilds, isLoading, isError} = useGetUserGuilds(String(session!.accessToken));
+    const [token, setToken] = useState<string | undefined>(undefined);
 
     useEffect(() => {
-        if (!session) {
+        if (!session && status !== "loading") {
             router.push('/');
         }
-    }, [router, session])
+
+        if (status === "authenticated") {
+            setToken(String(session!.accessToken));
+        }
+    }, [router, session, status])
 
     if (status === "loading") {
         return (
@@ -28,25 +31,13 @@ const Servers: NextPage = ({data, test}: InferGetServerSidePropsType<typeof getS
         )
     }
 
-    console.log(test, data);
-
     return (
         <DefaultPageContainer title={"Servers"}>
             <div>
-                {isLoading ? <span>Loading Guilds...</span> : isError ? <span>{isError}</span> : <span>Loaded {guilds!.length} Guilds</span>}
+                {token ? <UserGuildGrid token={token}/> : <></>}
             </div>
         </DefaultPageContainer>
     )
-}
-
-export const getServerSideProps: GetServerSideProps = async (context) => {
-    const bot = await Bot.getBot();
-    const data = bot.guilds.cache;
-    const test = "asdf"
-    console.log("Server side", data);
-    return {
-        props: {data, test}, // will be passed to the page component as props
-    }
 }
 
 
