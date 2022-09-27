@@ -2,6 +2,7 @@ import {NextApiRequest, NextApiResponse} from "next";
 import {getSession} from "next-auth/react";
 import {Bot} from "../../../../src/bot/Bot";
 import {Guild} from "discord.js";
+import {UnityUser} from "../../auth/[...nextauth]";
 
 export type BotGuilds = {
     message?: string,
@@ -18,7 +19,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse<B
             if (bot === undefined) {
                 res.status(503).json({message: "Discord Bot could not be initialized. Please try again."})
             } else {
-                if (session.user?.role === "ADMIN") {
+                if ((session.user as UnityUser).role === "ADMIN") {
                     res.status(200).json({guilds: bot.guilds.cache.toJSON()})
                 } else {
                     res.status(200).json({
