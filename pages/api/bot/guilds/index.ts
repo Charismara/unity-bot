@@ -12,17 +12,22 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse<B
     const session = await getSession({req})
     const bot = await Bot.getBot();
 
+
     if (req.method === 'GET') {
         if (session) {
-            if (session.user?.role === "ADMIN") {
-                res.status(200).json({guilds: bot.guilds.cache.toJSON()})
+            if (bot === undefined) {
+                res.status(503).json({message: "Discord Bot could not be initialized. Please try again."})
             } else {
-                res.status(200).json({
-                    guilds: bot.guilds.cache.filter(value => false).toJSON() //TODO access control
-                })
+                if (session.user?.role === "ADMIN") {
+                    res.status(200).json({guilds: bot.guilds.cache.toJSON()})
+                } else {
+                    res.status(200).json({
+                        guilds: bot.guilds.cache.filter(value => false).toJSON() //TODO access control
+                    })
+                }
             }
         } else {
-            res.status(403).json({
+            res.status(401).json({
                 message: 'You must be sign in to access this API'
             })
         }

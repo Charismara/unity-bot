@@ -41,4 +41,4 @@ const Servers: NextPage = () => {
 }
 
 
-export default Servers
+export default Servers;

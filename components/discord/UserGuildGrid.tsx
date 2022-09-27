@@ -1,6 +1,8 @@
 import {useGetUserGuilds} from "../util/DiscordAPIRequest";
 import {useGetBotGuilds} from "../util/SelfAPIRequest";
 import {LoadingSpinner} from "../loading/LoadingSpinner";
+import {PlusCircleIcon} from "@heroicons/react/24/outline";
+import Link from "next/link";
 
 type Props = {
     token: string
@@ -21,7 +23,9 @@ export function UserGuildGrid({token}: Props) {
     if (isLoading || botGuildsHook.isLoading) {
         return (
             <>
-                <LoadingSpinner/>
+                <div className={"grid content-center w-full h-full"}>
+                    <LoadingSpinner/>
+                </div>
             </>
         )
     }
@@ -53,11 +57,10 @@ export function UserGuildGrid({token}: Props) {
             id: guild.id,
             name: guild.name,
             icon: guild.icon,
-            canInviteBot: true,
+            canInviteBot: botGuildsHook.data?.guilds?.find(botData => botData.id == guild.id) === undefined,
             canManageBot: true
         });
     });
-
 
 
     return (
@@ -65,10 +68,9 @@ export function UserGuildGrid({token}: Props) {
             <div className="mx-auto max-w-7xl py-12 px-4 text-center sm:px-6 lg:px-8 lg:py-24">
                 <div className="space-y-12">
                     <div className="space-y-5 sm:mx-auto sm:max-w-xl sm:space-y-4 lg:max-w-5xl">
-                        <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Meet our team</h2>
+                        <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Select a Server</h2>
                         <p className="text-xl text-gray-500">
-                            Ornare sagittis, suspendisse in hendrerit quis. Sed dui aliquet lectus sit pretium egestas vel mattis
-                            neque.
+                            Only Servers with <span className={"italic"}>MANAGE_GUILD (in Discord)</span> or <span className={"italic"}>Bot Management (in the Bot Dashboard)</span> permission are visible.
                         </p>
                     </div>
                     <ul
@@ -77,37 +79,44 @@ export function UserGuildGrid({token}: Props) {
                     >
                         {guildData!.map((guild) => (
                             <li key={String(guild.id)}>
-                                <div className="space-y-6">
-                                    <img className="mx-auto h-40 w-40 rounded-full xl:h-56 xl:w-56" src={"https://cdn.discordapp.com/icons/" + guild.id + "/" + guild.icon + ".png"} alt=""/>
-                                    <div className="space-y-2">
-                                        <div className="space-y-1 text-lg font-medium leading-6">
-                                            <h3>{guild.name}</h3>
+                                <Link href={guild.canInviteBot ? "https://discord.com/api/oauth2/authorize?client_id=907572774439112754&permissions=8&scope=bot%20applications.commands&guild_id=" + guild.id : "/servers/" + guild.id}
+                                      target={guild.canInviteBot ? "_blank" : undefined}>
+                                    <a target={guild.canInviteBot ? "_blank" : undefined}>
+                                        <div className="space-y-6 hover:bg-gray-300 px-2 py-2 rounded-xl">
+                                            <div>
+                                                <img className="mx-auto h-40 w-40 rounded-full xl:h-56 xl:w-56" src={"https://cdn.discordapp.com/icons/" + guild.id + "/" + guild.icon + ".png"} alt="" onError={event => {
+                                                    event.preventDefault();
+                                                    event.currentTarget.style.display = "none"
+                                                    const placeholder = event.currentTarget.ownerDocument.getElementById(guild.id);
+                                                    if (placeholder) {
+                                                        placeholder.style.display = "block"
+                                                    }
+                                                }}/>
+                                                <div className={"mx-auto h-40 w-40 rounded-full xl:h-56 xl:w-56 mt-0 bg-gray-500"} style={{display: "none"}} id={guild.id}>
+                                                    <div className={"grid content-center h-full"}>
+                                                        <span className={"text-3xl font-bold tracking-tight sm:text-4xl text-white"}>?</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <div className="space-y-1 text-lg font-medium leading-6">
+                                                    <h3>{guild.name}</h3>
+                                                </div>
+                                                <ul role="list" className="flex justify-center space-x-5">
+                                                    {guild.canInviteBot ?
+                                                        <li>
+                                                            <span className={"text-gray-700"}>Invite Bot</span>
+                                                        </li>
+                                                        :
+                                                        <li>
+                                                            <span className={"text-gray-700"}>Manage Bot</span>
+                                                        </li>
+                                                    }
+                                                </ul>
+                                            </div>
                                         </div>
-                                        <ul role="list" className="flex justify-center space-x-5">
-                                            <li>
-                                                <a className="text-gray-400 hover:text-gray-500">
-                                                    <span className="sr-only">Twitter</span>
-                                                    <svg className="h-5 w-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path
-                                                            d="M6.29 18.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0020 3.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.073 4.073 0 01.8 7.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 010 16.407a11.616 11.616 0 006.29 1.84"/>
-                                                    </svg>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a className="text-gray-400 hover:text-gray-500">
-                                                    <span className="sr-only">LinkedIn</span>
-                                                    <svg className="h-5 w-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path
-                                                            fillRule="evenodd"
-                                                            d="M16.338 16.338H13.67V12.16c0-.995-.017-2.277-1.387-2.277-1.39 0-1.601 1.086-1.601 2.207v4.248H8.014v-8.59h2.559v1.174h.037c.356-.675 1.227-1.387 2.526-1.387 2.703 0 3.203 1.778 3.203 4.092v4.711zM5.005 6.575a1.548 1.548 0 11-.003-3.096 1.548 1.548 0 01.003 3.096zm-1.337 9.763H6.34v-8.59H3.667v8.59zM17.668 1H2.328C1.595 1 1 1.581 1 2.298v15.403C1 18.418 1.595 19 2.328 19h15.34c.734 0 1.332-.582 1.332-1.299V2.298C19 1.581 18.402 1 17.668 1z"
-                                                            clipRule="evenodd"
-                                                        />
-                                                    </svg>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
+                                    </a>
+                                </Link>
                             </li>
                         ))}
                     </ul>

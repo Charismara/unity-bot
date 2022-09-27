@@ -8,10 +8,19 @@ const getRequest = (url: string) => {
     })
 }
 
-export function useGetBotStatus(obj: {}) {
-    if (obj) {
-    }
-    const {data, error} = useSWR<BotStatus>("", () => getRequest('/api/bot').then(value => value.json()))
+export const postRequest = (url: string, body: object, token: string) => {
+    return fetch(url, {
+        method: 'POST',
+        body: JSON.stringify(body),
+        headers: {
+            'Authentication': "Bearer " + token
+        }
+    })
+        .then(value => value.json())
+}
+
+export function useGetBotStatus(hostname: string) {
+    const {data, error} = useSWR<BotStatus>(hostname, () => getRequest('/api/bot').then(value => value.json()))
     return {
         isLoading: !error && !data,
         isError: error,
