@@ -7,6 +7,7 @@ import {PaperClipIcon} from "@heroicons/react/24/outline";
 import {BotStatus} from "../../components/discord/BotStatus";
 import {StartBotButton} from "../../components/discord/StartBotButton";
 import {RestartBotButton} from "../../components/discord/RestartBotButton";
+import {UnityUser} from "../api/auth/[...nextauth]";
 
 const Bot: NextPage = () => {
     const {data: session, status} = useSession();
@@ -18,7 +19,7 @@ const Bot: NextPage = () => {
             router.push('/')
         }
         if (status === "authenticated") {
-            if (session?.user.role !== "ADMIN") {
+            if ((session?.user as UnityUser).role !== "ADMIN") {
                 router.push('/')
             }
         }
