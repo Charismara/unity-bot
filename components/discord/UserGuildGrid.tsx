@@ -52,7 +52,7 @@ export function UserGuildGrid({token}: Props) {
 
     const guildData: GuildData[] = []
 
-    guilds?.filter(guild => (guild.permissions & 0x20) === 0x20).forEach(guild => {
+    guilds?.filter(guild => (guild.permissions as any & 0x20) === 0x20).forEach(guild => {
         guildData.push({
             id: guild.id,
             name: guild.name,
