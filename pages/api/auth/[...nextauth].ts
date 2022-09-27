@@ -7,6 +7,7 @@ import {JWT} from "next-auth/jwt";
 const prima = new PrismaClient();
 
 export type UnityUser = {
+    id?: string | null;
     name?: string | null;
     email?: string | null;
     image?: string | null;

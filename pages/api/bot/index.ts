@@ -1,6 +1,7 @@
 import {NextApiRequest, NextApiResponse} from "next";
 import {Bot} from "../../../src/bot/Bot";
 import {getSession} from "next-auth/react";
+import {UnityUser} from "../auth/[...nextauth]";
 
 export type BotStatus = {
     isReady?: boolean,
@@ -17,7 +18,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse<B
     //Get Bot Status
     if (req.method === 'GET') {
         if (session) {
-            if (session.user?.role === "MODERATOR" || session.user?.role === "ADMIN") {
+            if ((session.user as UnityUser).role === "MODERATOR" || (session.user as UnityUser).role === "ADMIN") {
                 res.status(200).json({isReady: bot.isReady()})
             } else {
                 res.status(403).json({
@@ -35,24 +36,24 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse<B
     //Set Bot Status
     if (req.method === 'POST') {
         if (session) {
-            if (session.user.role === "ADMIN") {
+            if ((session.user as UnityUser).role === "ADMIN") {
                 const body = JSON.parse(req.body) as BotStatusChangeRequest;
                 if (body) {
                     let success = false;
                     if (body.action === "start") {
-                        console.log("Starting Discord bot. Requested by user with id: ", JSON.stringify(session.user.id));
+                        console.log("Starting Discord bot. Requested by user with id: ", JSON.stringify((session.user as UnityUser).id));
                         await Bot.start();
                         success = true;
                     }
 
                     if (body.action === "shutdown") {
-                        console.log("Shutting down Discord bot. Requested by user with id: ", JSON.stringify(session.user.id));
+                        console.log("Shutting down Discord bot. Requested by user with id: ", JSON.stringify((session.user as UnityUser).id));
                         await Bot.stop();
                         success = true;
                     }
 
                     if (body.action === "restart") {
-                        console.log("Restarting Discord bot. Requested by user with id: ", JSON.stringify(session.user.id));
+                        console.log("Restarting Discord bot. Requested by user with id: ", JSON.stringify((session.user as UnityUser).id));
                         await Bot.stop();
                         await Bot.start();
                         success = true;

@@ -1,11 +1,11 @@
 import {Command} from "./Command";
-import {number} from "prop-types";
+import {CommandInteractionOptionResolver} from "discord.js";
 
 const Random: Command = {
     name: "random",
     description: "Returns a random value from a given list",
     run: async (client, interaction) => {
-        const list: string = interaction.options.getString('options');
+        const list: string = (interaction.options as CommandInteractionOptionResolver).getString('options')!;
         const options = list.split(';');
         const random = Math.random() * (options.length - 1) + 1
         const result = options[Math.floor(random)];
