@@ -1,6 +1,6 @@
 import {NextApiRequest, NextApiResponse} from "next";
 import {getSession} from "next-auth/react";
-import {Bot} from "../../../../components/bot/Bot";
+import {Bot} from "../../../../src/bot/Bot";
 import {Guild} from "discord.js";
 
 export type BotGuilds = {

@@ -1,5 +1,5 @@
 import {NextApiRequest, NextApiResponse} from "next";
-import {Bot} from "../../../components/bot/Bot";
+import {Bot} from "../../../src/bot/Bot";
 import {getSession} from "next-auth/react";
 
 export type BotStatus = {
