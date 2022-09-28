@@ -22,7 +22,7 @@ function classNames(...classes: string[]) {
 
 export function LoginButton(props: Props) {
     const {data: session, status} = useSession();
-    if (session && status === "authenticated") {
+    if (session && session.user && status === "authenticated") {
         const user = session.user as UnityUser
         const managementControls = [];
         if (user.role == "MODERATOR" || user.role == "ADMIN") {
