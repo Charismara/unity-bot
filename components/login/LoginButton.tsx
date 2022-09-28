@@ -10,27 +10,21 @@ import {
 import Image from "next/image";
 import {Fragment, useRef} from "react";
 import Link from "next/link";
+import {UnityUser} from "../../pages/api/auth/[...nextauth]";
 
 type Props = {
     className?: string
 }
 
-export type User = {
-    email: string,
-    id: string,
-    image: string,
-    name: string,
-    role: "ADMIN" | "MODERATOR" | "USER" | "BANNED"
-}
 
 function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(' ')
 }
 
 export function LoginButton(props: Props) {
-    const {data: session} = useSession();
-    if (session) {
-        const user = session.user as User
+    const {data: session, status} = useSession();
+    if (session && status === "authenticated") {
+        const user = session.user as UnityUser
         const managementControls = [];
         if (user.role == "MODERATOR" || user.role == "ADMIN") {
             managementControls.push({
