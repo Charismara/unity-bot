@@ -7,7 +7,7 @@
     "build:next": "next build",
     "build:server": "tsc --project tsconfig.server.json",
     "build": "npm run build:next && npm run build:server",
-    "start": "NODE_ENV=production node dist/index.js",
+    "start": "cross-env NODE_ENV=production node dist/server/index.js",
     "lint": "next lint",
     "postinstall": "prisma generate"
   },
@@ -36,6 +36,7 @@
     "@types/react": "18.0.21",
     "@types/react-dom": "18.0.6",
     "autoprefixer": "^10.4.12",
+    "cross-env": "^7.0.3",
     "eslint": "8.24.0",
     "eslint-config-next": "12.3.1",
     "postcss": "^8.4.16",

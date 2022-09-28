@@ -20,7 +20,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse<B
     if (req.method === 'GET') {
         if (session) {
             if ((session.user as UnityUser).role === "MODERATOR" || (session.user as UnityUser).role === "ADMIN") {
-                console.log("Bot Online:", bot.destroy())
                 res.status(200).json({isReady: bot.isReady()})
             } else {
                 res.status(403).json({
@@ -50,7 +49,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse<B
 
                     if (body.action === "shutdown") {
                         console.log("Shutting down Discord bot. Requested by user with id: ", JSON.stringify((session.user as UnityUser).id));
-                        await bot.destroy();
+                        bot.destroy();
                         success = true;
                     }
 
