@@ -1,7 +1,6 @@
 import {NextApiRequest, NextApiResponse} from "next";
 import {getSession} from "next-auth/react";
-import {Bot} from "../../../../src/bot/Bot";
-import {Guild} from "discord.js";
+import {Client, Guild} from "discord.js";
 import {UnityUser} from "../../auth/[...nextauth]";
 
 export type BotGuilds = {
@@ -11,8 +10,7 @@ export type BotGuilds = {
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse<BotGuilds>) {
     const session = await getSession({req})
-    const bot = await Bot.getBot();
-
+    const bot = (req as any).discordBot as Client;
 
     if (req.method === 'GET') {
         if (session) {

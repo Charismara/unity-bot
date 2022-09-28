@@ -1,17 +1,19 @@
 import {postRequest, useGetBotStatus} from "../util/SelfAPIRequest";
 import {useSession} from "next-auth/react";
 import {useEffect, useState} from "react";
+import {useSWRConfig} from "swr";
 
 export function StartBotButton() {
     const botStatus = useGetBotStatus(typeof window !== "undefined" ? window.location.hostname : "");
     const [token, setToken] = useState<string | undefined>(undefined);
     const {data: session, status} = useSession();
+    const {mutate} = useSWRConfig()
 
     useEffect(() => {
         if (status === "authenticated") {
             setToken(String(session.accessToken));
         }
-    }, [status,session]);
+    }, [status, session]);
 
     if (botStatus.data === undefined || token === undefined) {
         return (
@@ -28,6 +30,7 @@ export function StartBotButton() {
                     await postRequest("/api/bot", {
                         action: "shutdown"
                     }, token);
+                    await mutate("api/bot");
                 }}
             >
                 Shutdown
@@ -43,6 +46,7 @@ export function StartBotButton() {
                 await postRequest("/api/bot", {
                     action: "start"
                 }, token);
+                await mutate("api/bot");
             }}
         >
             Start
