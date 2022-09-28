@@ -41,8 +41,6 @@ export function LoginButton(props: Props) {
             })
         }
 
-        console.log("Current User: ", user)
-
         return (
             <>
                 <Menu as="div" className="text-left hidden md:relative md:inline-block">
