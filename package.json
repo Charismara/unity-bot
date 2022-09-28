@@ -7,7 +7,7 @@
     "build:next": "next build",
     "build:server": "tsc --project tsconfig.server.json",
     "build": "npm run build:next && npm run build:server",
-    "start": "cross-env NODE_ENV=production node .next/dist/server/index.js",
+    "start": "cross-env NODE_ENV=production node dist/server/index.js",
     "lint": "next lint",
     "postinstall": "prisma generate"
   },
