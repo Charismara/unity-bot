@@ -2,12 +2,11 @@
   "name": "unity-bot",
   "version": "0.1.0",
   "private": true,
+  "main": "server/index.ts",
   "scripts": {
-    "dev": "ts-node --project tsconfig.server.json server/index.ts",
-    "build:next": "next build",
-    "build:server": "tsc --project tsconfig.server.json",
-    "build": "npm run build:next && npm run build:server",
-    "start": "cross-env NODE_ENV=production node dist/server/index.js",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "cross-env NODE_ENV=production next start",
     "lint": "next lint",
     "postinstall": "prisma generate"
   },
